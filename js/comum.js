@@ -6,7 +6,8 @@ const PROMOCAO = {
   chaveRodadas: 'quizPremiado.rodadas',
   chaveParticipante: 'quizPremiado.participante',
   chaveSaldo: 'quizPremiado.saldo',
-  chavePremios: 'quizPremiado.premios'
+  chavePremios: 'quizPremiado.premios',
+  chaveCompartilhamentos: 'quizPremiado.compartilhamentos'
 };
 
 /* -------------------------- Armazenamento local -------------------------- */
@@ -104,6 +105,31 @@ function salvarPremio(premio) {
   salvarMapa(PROMOCAO.chavePremios, mapa);
 }
 
+/* Usada pelo resgate para marcar o prêmio como retirado e guardar o seguro. */
+function atualizarPremio(id, dados) {
+  const mapa = lerMapa(PROMOCAO.chavePremios);
+  const lista = Array.isArray(mapa[emailAtivo()]) ? mapa[emailAtivo()] : [];
+  const premio = lista.filter(item => item.id === id)[0];
+  if (!premio) return;
+
+  Object.assign(premio, dados);
+  mapa[emailAtivo()] = lista;
+  salvarMapa(PROMOCAO.chavePremios, mapa);
+}
+
+/* Compartilhamentos feitos por este e-mail (cada um vale um giro). */
+
+function lerCompartilhamentos() {
+  const valor = parseInt(lerMapa(PROMOCAO.chaveCompartilhamentos)[emailAtivo()], 10);
+  return Number.isFinite(valor) && valor > 0 ? valor : 0;
+}
+
+function contarCompartilhamento() {
+  const mapa = lerMapa(PROMOCAO.chaveCompartilhamentos);
+  mapa[emailAtivo()] = lerCompartilhamentos() + 1;
+  salvarMapa(PROMOCAO.chaveCompartilhamentos, mapa);
+}
+
 /* Antes disso, saldo e prêmios eram um valor solto, sem dono. Se ainda estiver
    no formato antigo, passa tudo para o e-mail que está salvo no navegador. */
 function migrarParaMapaPorEmail() {
@@ -125,7 +151,27 @@ function migrarParaMapaPorEmail() {
   }
 }
 
+/* Prêmios sorteados antes do resgate existir não tinham id; sem ele o resgate
+   não sabe qual registro atualizar. */
+function garantirIdsDosPremios() {
+  const mapa = lerMapa(PROMOCAO.chavePremios);
+  let mudou = false;
+
+  Object.keys(mapa).forEach(email => {
+    if (!Array.isArray(mapa[email])) return;
+    mapa[email].forEach(premio => {
+      if (!premio.id) {
+        premio.id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        mudou = true;
+      }
+    });
+  });
+
+  if (mudou) salvarMapa(PROMOCAO.chavePremios, mapa);
+}
+
 migrarParaMapaPorEmail();
+garantirIdsDosPremios();
 
 /* Deixa o nome no formato usado no ranking: "Pedro H." */
 function abreviarNome(nome) {

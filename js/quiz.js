@@ -2,7 +2,7 @@
    pontuação e tela de resultado. */
 
 const CONFIG = {
-  rodadasPorEmail: 3,
+  rodadasPorEmail: 1,
   totalPerguntas: 10,
   segundosPorPergunta: 20,
   pontosPorAcerto: 100,
@@ -13,7 +13,8 @@ const tela = {
   cadastro: document.getElementById('tela-cadastro'),
   jogo: document.getElementById('tela-jogo'),
   resultado: document.getElementById('tela-resultado'),
-  roleta: document.getElementById('tela-roleta')
+  roleta: document.getElementById('tela-roleta'),
+  resgate: document.getElementById('tela-resgate')
 };
 
 const el = {
@@ -89,8 +90,8 @@ function rolarAteQuiz() {
 }
 
 /* --------------------------- Limite por e-mail ---------------------------- */
-/* A promoção dá 3 rodadas por e-mail. Quem esgotar continua podendo girar a
-   roleta com os pontos que já acumulou. */
+/* O quiz é respondido uma vez por e-mail. Depois disso, giros extras vêm de
+   compartilhar o link da promoção. */
 
 function rodadasUsadas(email) {
   return lerRodadas().filter(registro => registro.email === email).length;
@@ -102,12 +103,12 @@ function rodadasRestantes(email) {
 
 function avisarLimiteAtingido() {
   const titulo = document.createElement('strong');
-  titulo.textContent = 'Este e-mail já usou as ' + CONFIG.rodadasPorEmail + ' participações da promoção.';
+  titulo.textContent = 'Você já respondeu o quiz com este e-mail.';
 
   const detalhe = document.createElement('span');
   detalhe.textContent = lerSaldo() >= CUSTO_DO_GIRO
-    ? 'Você ainda tem pontos guardados: dá para continuar girando a roleta.'
-    : 'Os pontos que você acumulou continuam valendo para girar a roleta.';
+    ? 'Seus pontos continuam valendo: gire a roleta ou compartilhe o link para ganhar mais giros.'
+    : 'Para ganhar mais giros, compartilhe o link da promoção na tela da roleta.';
 
   el.avisoLimite.textContent = '';
   el.avisoLimite.append(titulo, detalhe);
@@ -392,8 +393,9 @@ function finalizar() {
   const restantes = rodadasRestantes(participante.email);
   el.rodadasRestantes.textContent = restantes > 0
     ? 'Você ainda tem ' + restantes + (restantes === 1 ? ' participação' : ' participações') + ' com este e-mail.'
-    : 'Esta foi sua última participação. Seus pontos continuam valendo na roleta.';
-  el.repetir.disabled = restantes === 0;
+    : 'O quiz é uma vez por e-mail. Para ganhar mais giros, compartilhe o link da promoção na roleta.';
+  /* Sem rodada sobrando o botão some: quem manda agora é o compartilhamento. */
+  el.repetir.hidden = restantes === 0;
 
   renderizarRanking();
   atualizarRoleta();

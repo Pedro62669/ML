@@ -120,7 +120,7 @@
 
       <p class="secao__nota">
         A roleta também tem cupom de 10% OFF, cupom de frete grátis para uma compra no site,
-        R$ 50 em vale-compras e a fatia <strong>Gire de novo</strong>, que devolve os pontos.
+        R$ 50 e R$ 100 em vale-compras, além da fatia <strong>Gire de novo</strong>, que devolve os pontos.
         Mas cuidado: duas fatias não premiam
         &ndash; <strong>Não foi dessa vez</strong> e <strong>Perdeu 1 giro</strong>, que ainda tira
         100 pontos do seu saldo. Cada produto só pode ser ganho uma vez: depois de sair, a fatia
@@ -150,7 +150,7 @@
         <article class="cartao passo">
           <div class="passo__numero">3</div>
           <h3>Gire a roleta</h3>
-          <p>Cada acerto já rende pelo menos um giro: são 100 pontos por giro, e cada acerto vale 100 ou mais.</p>
+          <p>Cada acerto já rende pelo menos um giro: são 100 pontos por giro. Compartilhar o link vale mais 1 giro.</p>
         </article>
       </div>
     </div>
@@ -171,7 +171,7 @@
             <li>10 perguntas, 20 segundos cada.</li>
             <li>Cada acerto vale 100 pontos, mais bônus por rapidez.</li>
             <li>A cada 100 pontos você libera um giro na roleta de prêmios.</li>
-            <li>Cada e-mail pode responder o quiz 3 vezes.</li>
+            <li>Uma participação por e-mail &ndash; giros extras vêm de compartilhar o link.</li>
           </ul>
 
           <div class="feedback" id="aviso-limite" role="status" hidden></div>
@@ -296,14 +296,162 @@
 
           <div class="roleta__resultado" id="roleta-resultado" role="status" hidden></div>
 
-          <div class="acoes-centro">
-            <button class="botao botao--secundario" id="botao-outra-rodada" type="button">Responder outra rodada</button>
+          <div class="compartilhar">
+            <h3>Quer mais giros?</h3>
+            <p>O quiz é uma vez só, mas cada compartilhamento do link da promoção vale 1 giro extra.</p>
+            <div class="compartilhar__botoes" id="compartilhar-botoes"></div>
+            <p class="compartilhar__aviso" id="compartilhar-aviso" role="status" hidden></p>
+            <p class="compartilhar__contador" id="compartilhar-contador"></p>
           </div>
 
           <div class="premios-ganhos">
             <h3>Seus prêmios</h3>
-            <ul id="lista-premios"></ul>
+            <div id="lista-premios"></div>
           </div>
+        </section>
+
+        <!-- --------------------- ETAPA 5: RESGATE --------------------- -->
+        <section class="cartao painel" id="tela-resgate" hidden>
+
+          <!-- endereço de entrega -->
+          <div id="resgate-entrega">
+            <h2>Resgate do seu prêmio</h2>
+            <p>Informe o endereço de entrega. O frete é calculado pelo CEP e pago por você.</p>
+
+            <div class="resgate__produto">
+              <img id="resgate-imagem" src="" alt="">
+              <div>
+                <small>Prêmio a resgatar</small>
+                <strong id="resgate-nome"></strong>
+              </div>
+            </div>
+
+            <form class="formulario" id="formulario-entrega" novalidate>
+              <label class="campo" for="cep">
+                <span>CEP</span>
+                <input id="cep" type="text" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000">
+                <span class="campo__erro">Digite um CEP com 8 dígitos.</span>
+              </label>
+
+              <label class="campo" for="endereco">
+                <span>Endereço</span>
+                <input id="endereco" type="text" maxlength="80" autocomplete="street-address" placeholder="Rua, avenida...">
+                <span class="campo__erro">Digite o endereço.</span>
+              </label>
+
+              <label class="campo" for="numero">
+                <span>Número</span>
+                <input id="numero" type="text" maxlength="10" placeholder="123">
+                <span class="campo__erro">Digite o número.</span>
+              </label>
+
+              <label class="campo" for="complemento">
+                <span>Complemento (opcional)</span>
+                <input id="complemento" type="text" maxlength="40" placeholder="Apto, bloco...">
+              </label>
+
+              <label class="campo" for="cidade">
+                <span>Cidade</span>
+                <input id="cidade" type="text" maxlength="50" placeholder="Sua cidade">
+                <span class="campo__erro">Digite a cidade.</span>
+              </label>
+
+              <label class="campo" for="uf">
+                <span>Estado (UF)</span>
+                <input id="uf" type="text" maxlength="2" placeholder="SP">
+                <span class="campo__erro">Digite a sigla do estado.</span>
+              </label>
+
+              <button class="botao botao--principal botao--largo botao--grande" type="submit">Continuar</button>
+            </form>
+          </div>
+
+          <!-- oferta de seguro -->
+          <div id="resgate-seguro" hidden>
+            <h2>Adicione um seguro</h2>
+            <p>Estenda a garantia de fábrica por mais tempo e proteja seu produto contra falhas mecânicas.</p>
+            <p class="seguro__detalhes"><a href="regulamento.html">Ver detalhes</a></p>
+
+            <div class="seguro__alvo">
+              <small>Garantia estendida para:</small>
+              <strong id="seguro-produto"></strong>
+            </div>
+
+            <div class="seguro__opcoes" id="seguro-opcoes"></div>
+
+            <p class="seguro__termos">
+              Ao adicionar, você aceita as <a href="regulamento.html">Condições gerais</a>
+              e os <a href="regulamento.html">Termos de cobrança do prêmio do seguro</a>.
+            </p>
+
+            <div class="acoes-centro">
+              <button class="botao botao--secundario" id="botao-pular-seguro" type="button">Agora não</button>
+              <button class="botao botao--principal" id="botao-adicionar-seguro" type="button">Adicionar</button>
+            </div>
+          </div>
+
+          <!-- checkout do frete e do seguro -->
+          <div id="resgate-checkout" hidden>
+            <h2>Finalize sua compra</h2>
+
+            <div class="checkout">
+              <div class="checkout__coluna">
+
+                <div class="checkout__produto">
+                  <img id="checkout-imagem" src="" alt="">
+                  <span id="checkout-nome"></span>
+                </div>
+
+                <div class="checkout__bloco">
+                  <h3>Forma de entrega</h3>
+                  <div class="checkout__abas" id="checkout-abas">
+                    <button class="checkout__aba checkout__aba--ativa" type="button" data-entrega="frete">
+                      Frete <small id="aba-frete-valor">R$ 0,00</small>
+                    </button>
+                    <button class="checkout__aba" type="button" data-entrega="retirada">
+                      Retirada <small class="checkout__gratis">Grátis</small>
+                    </button>
+                  </div>
+
+                  <div class="checkout__endereco" id="checkout-endereco"></div>
+
+                  <div class="checkout__envio">
+                    <strong id="checkout-prazo"></strong>
+                    <small>Única opção disponível</small>
+                  </div>
+                </div>
+
+                <div class="checkout__bloco">
+                  <h3>Meios de pagamento</h3>
+                  <div class="checkout__pagamentos" id="checkout-pagamentos"></div>
+                </div>
+
+              </div>
+
+              <aside class="checkout__resumo">
+                <h3>Resumo da compra</h3>
+                <dl id="checkout-linhas"></dl>
+                <div class="checkout__total">
+                  <span>Total</span>
+                  <strong id="checkout-total">R$ 0,00</strong>
+                </div>
+                <p class="checkout__economia" id="checkout-economia"></p>
+                <button class="botao botao--principal botao--largo" id="botao-pagar" type="button">Pagar e finalizar</button>
+                <button class="checkout__voltar" id="botao-voltar-seguro" type="button">Voltar para o seguro</button>
+              </aside>
+            </div>
+          </div>
+
+          <!-- confirmação -->
+          <div id="resgate-fim" hidden>
+            <div class="medalha">&#10003;</div>
+            <h2>Resgate concluído</h2>
+            <p id="resgate-resumo"></p>
+            <div class="acoes-centro">
+              <button class="botao botao--principal" id="botao-voltar-roleta" type="button">Voltar para a roleta</button>
+            </div>
+          </div>
+
         </section>
 
       </div>
@@ -332,6 +480,8 @@
 <script src="js/perguntas.js" charset="UTF-8"></script>
 <script src="js/ranking.js" charset="UTF-8"></script>
 <script src="js/roleta.js" charset="UTF-8"></script>
+<script src="js/compartilhar.js" charset="UTF-8"></script>
+<script src="js/resgate.js" charset="UTF-8"></script>
 <script src="js/quiz.js" charset="UTF-8"></script>
 </body>
 </html>

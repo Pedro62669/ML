@@ -7,20 +7,20 @@ const CUSTO_DO_GIRO = 100;
 
 const SETORES = [
   {
-    rotulo: 'PlayStation 5', tipo: 'produto', peso: 1,
+    rotulo: 'PlayStation 5', tipo: 'produto', peso: 1, valor: 3499,
     nome: 'Console PlayStation® 5 Slim Edição Digital 825 Gb Branco - Sony',
     fundo: '#2968C8', texto: '#FFFFFF',
     imagem: 'imagens/premios/playstation5.webp',
     mensagem: 'O prêmio máximo da promoção é seu!'
   },
   {
-    rotulo: '10% OFF', tipo: 'cupom', peso: 13,
+    rotulo: '10% OFF', tipo: 'cupom', peso: 11,
     nome: 'Cupom de 10% OFF',
     fundo: '#FFE600', texto: '#1A3B7C',
     mensagem: '10% de desconto na próxima compra, sem valor mínimo.'
   },
   {
-    rotulo: 'Geladeira', tipo: 'produto', peso: 2,
+    rotulo: 'Geladeira', tipo: 'produto', peso: 2, valor: 4599,
     nome: 'Geladeira Electrolux Frost Free com AutoSense 480L Efficient Duplex Branca',
     fundo: '#2968C8', texto: '#FFFFFF',
     imagem: 'imagens/premios/geladeira.webp',
@@ -32,20 +32,20 @@ const SETORES = [
     mensagem: 'Esta fatia não vale prêmio. Junte mais ' + CUSTO_DO_GIRO + ' pontos e tente outra vez.'
   },
   {
-    rotulo: 'Smart TV', tipo: 'produto', peso: 2,
+    rotulo: 'Smart TV', tipo: 'produto', peso: 2, valor: 4299,
     nome: 'Samsung Smart TV 55" MiniLED 4K',
     fundo: '#2968C8', texto: '#FFFFFF',
     imagem: 'imagens/premios/televisao.webp',
     mensagem: 'Tela MiniLED 4K de 55 polegadas.'
   },
   {
-    rotulo: 'Frete grátis', tipo: 'cupom', peso: 13,
+    rotulo: 'Frete grátis', tipo: 'cupom', peso: 11,
     nome: 'Cupom de frete grátis',
     fundo: '#FFE600', texto: '#1A3B7C',
     mensagem: 'Frete grátis em uma compra no site, sem valor mínimo. Não vale para a entrega dos prêmios da roleta.'
   },
   {
-    rotulo: 'Air Fryer', tipo: 'produto', peso: 4,
+    rotulo: 'Air Fryer', tipo: 'produto', peso: 4, valor: 549,
     nome: 'Fritadeira Air Fryer Forno Oven 12L Mondial',
     fundo: '#2968C8', texto: '#FFFFFF',
     imagem: 'imagens/premios/airfryer.webp',
@@ -57,29 +57,35 @@ const SETORES = [
     mensagem: 'Além do giro que você acabou de usar, saem mais ' + CUSTO_DO_GIRO + ' pontos do saldo.'
   },
   {
-    rotulo: 'Liquidificador', tipo: 'produto', peso: 6,
+    rotulo: 'Liquidificador', tipo: 'produto', peso: 6, valor: 299,
     nome: 'Liquidificador Philco 1500W 3,1L 12 Velocidades com 6 Lâminas',
     fundo: '#2968C8', texto: '#FFFFFF',
     imagem: 'imagens/premios/liquidificador.webp',
     mensagem: '1500W, jarra de 3,1L, 12 velocidades e 6 lâminas.'
   },
   {
-    rotulo: 'R$ 50', tipo: 'cupom', peso: 10,
+    rotulo: 'R$ 50', tipo: 'cupom', peso: 8,
     nome: 'R$ 50 em vale-compras',
     fundo: '#FFE600', texto: '#1A3B7C',
     mensagem: 'R$ 50 de crédito para usar no site.'
   },
   {
-    rotulo: 'Bicicleta', tipo: 'produto', peso: 2,
+    rotulo: 'Bicicleta', tipo: 'produto', peso: 2, valor: 8999,
     nome: 'Bicicleta Elétrica Oggi Street Go S12 Tourney',
     fundo: '#2968C8', texto: '#FFFFFF',
     imagem: 'imagens/premios/bicicleta.webp',
     mensagem: 'Bicicleta elétrica com câmbio Shimano Tourney.'
   },
   {
-    rotulo: 'Lava e Seca', tipo: 'produto', peso: 2,
+    rotulo: 'R$ 100', tipo: 'cupom', peso: 6,
+    nome: 'R$ 100 em vale-compras',
+    fundo: '#FFE600', texto: '#1A3B7C',
+    mensagem: 'R$ 100 de crédito para usar no site.'
+  },
+  {
+    rotulo: 'Lava e Seca', tipo: 'produto', peso: 2, valor: 4799,
     nome: 'Máquina Lava e Seca Electrolux 12kg Inverter',
-    fundo: '#1A3B7C', texto: '#FFFFFF',
+    fundo: '#2968C8', texto: '#FFFFFF',
     imagem: 'imagens/premios/maquina-de-lavar.webp',
     mensagem: 'Lava e seca de 12 kg com motor Inverter.'
   },
@@ -108,8 +114,7 @@ const roleta = {
   giros: document.getElementById('roleta-giros'),
   aviso: document.getElementById('roleta-aviso'),
   resultado: document.getElementById('roleta-resultado'),
-  premios: document.getElementById('lista-premios'),
-  outraRodada: document.getElementById('botao-outra-rodada')
+  premios: document.getElementById('lista-premios')
 };
 
 let setores = [];
@@ -192,33 +197,70 @@ function atualizarRoleta() {
   listarPremios();
 }
 
+/* Os dois grupos são entregues de formas diferentes, então aparecem
+   separados: produto vai pelos Correios, cupom vai por e-mail. */
+const GRUPOS_DE_PREMIOS = [
+  { titulo: 'Prêmios físicos', tipo: 'produto', status: '', variacao: 'premios-ganhos__status--produto' },
+  { titulo: 'Cupons e vales', tipo: 'cupom', status: 'E-mail em até 24h', variacao: '' }
+];
+
 function listarPremios() {
   const premios = lerPremios();
   roleta.premios.textContent = '';
 
   if (!premios.length) {
-    const vazio = document.createElement('li');
+    const vazio = document.createElement('p');
     vazio.className = 'premios-ganhos__vazio';
     vazio.textContent = 'Você ainda não girou a roleta.';
     roleta.premios.append(vazio);
     return;
   }
 
-  premios.slice().reverse().forEach(premio => {
-    const item = document.createElement('li');
+  GRUPOS_DE_PREMIOS.forEach(grupo => {
+    /* Do mais recente para o mais antigo, como já era antes. */
+    const itens = premios.filter(premio => premio.tipo === grupo.tipo).reverse();
+    if (!itens.length) return;
 
-    const nome = document.createElement('strong');
-    nome.textContent = premio.rotulo;
-    item.append(nome);
+    const titulo = document.createElement('h4');
+    titulo.className = 'premios-ganhos__grupo';
+    titulo.textContent = grupo.titulo + ' (' + itens.length + ')';
 
-    if (premio.tipo === 'cupom') {
-      const status = document.createElement('span');
-      status.className = 'premios-ganhos__status';
-      status.textContent = 'E-mail em até 24h';
-      item.append(status);
-    }
+    const lista = document.createElement('ul');
 
-    roleta.premios.append(item);
+    itens.forEach(premio => {
+      const item = document.createElement('li');
+
+      const nome = document.createElement('strong');
+      nome.textContent = premio.rotulo;
+
+      item.append(nome);
+
+      if (grupo.tipo === 'produto') {
+        /* Produto é resgatado aqui mesmo no site. */
+        if (premio.resgatado) {
+          const status = document.createElement('span');
+          status.className = 'premios-ganhos__status premios-ganhos__status--produto';
+          status.textContent = premio.seguro ? 'Resgatado com seguro' : 'Resgatado';
+          item.append(status);
+        } else {
+          const resgatar = document.createElement('button');
+          resgatar.type = 'button';
+          resgatar.className = 'botao botao--principal botao--pequeno';
+          resgatar.textContent = 'Resgatar prêmio';
+          resgatar.addEventListener('click', () => abrirResgate(premio));
+          item.append(resgatar);
+        }
+      } else {
+        const status = document.createElement('span');
+        status.className = ('premios-ganhos__status ' + grupo.variacao).trim();
+        status.textContent = grupo.status;
+        item.append(status);
+      }
+
+      lista.append(item);
+    });
+
+    roleta.premios.append(titulo, lista);
   });
 }
 
@@ -275,6 +317,7 @@ function encerrarGiro(setor) {
       : 'Saíram mais ' + perdidos + ' pontos do seu saldo.';
   } else if (setor.tipo !== 'nada') {
     salvarPremio({
+      id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       rotulo: setor.nome || setor.rotulo,
       tipo: setor.tipo,
       codigo: setor.tipo === 'cupom' ? gerarCodigoPremio() : null,
@@ -354,4 +397,3 @@ atualizarSetores();
 atualizarRoleta();
 
 roleta.botao.addEventListener('click', girar);
-roleta.outraRodada.addEventListener('click', () => voltarParaOQuiz());
