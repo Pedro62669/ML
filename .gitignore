@@ -1,0 +1,7 @@
+# Instalador que estava solto na pasta de imagens (não faz parte do projeto)
+*.exe
+
+# Lixo de sistema
+Thumbs.db
+Desktop.ini
+.DS_Store

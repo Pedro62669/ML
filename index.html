@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz Premiado | Mercado Livre</title>
+<meta name="description" content="Responda 10 perguntas sobre o Brasil e concorra a até R$ 5 mil em prêmios. Participação gratuita.">
+<link rel="icon" href="imagens/mercado-livre-seeklogo.svg">
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+<!-- ============================ TOPO ============================ -->
+<header class="topo">
+  <div class="container topo__conteudo">
+    <img class="topo__logo" src="imagens/mercado-livre-seeklogo.svg" alt="Mercado Livre">
+  </div>
+</header>
+
+<!-- Faixa com o nome da campanha, logo abaixo da marca -->
+<div class="faixa-campanha">
+  <div class="container">Promoção Mês da Independência Mercado Livre</div>
+</div>
+
+<!-- ============================ BANNER ============================ -->
+<section class="banner">
+  <div class="container">
+    <button class="banner__botao" type="button" data-ir-para-quiz>
+      <img src="imagens/banner.webp" alt="Quiz Premiado: até 5 mil em prêmios. Toque para começar o quiz." width="2048" height="683">
+    </button>
+  </div>
+</section>
+
+<main>
+  <!-- ============================ CHAMADA ============================ -->
+  <div class="container">
+    <div class="chamada">
+      <div class="chamada__texto">
+        <h1>10 perguntas sobre o Brasil. Até R$ 5 mil em prêmios.</h1>
+        <p>Participação gratuita e sem compra. Leva menos de 5 minutos.</p>
+        <div class="contador" id="contador" aria-label="Tempo restante da promoção">
+          <div><b data-contador="dias">--</b><span>dias</span></div>
+          <div><b data-contador="horas">--</b><span>horas</span></div>
+          <div><b data-contador="minutos">--</b><span>min</span></div>
+          <div><b data-contador="segundos">--</b><span>seg</span></div>
+        </div>
+      </div>
+      <div class="chamada__acao">
+        <button class="botao botao--principal botao--grande" type="button" data-ir-para-quiz>Quero participar</button>
+        <span class="chamada__aviso">Promoção válida até 15/09/2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ PRÊMIOS ============================ -->
+  <section class="secao" id="premios">
+    <div class="container">
+      <h2 class="secao__titulo">Os prêmios da roleta</h2>
+      <p class="secao__subtitulo">Cada 100 pontos que você acumula no quiz valem um giro na roleta. O que parar embaixo da seta é seu.</p>
+
+      <div class="premios-grade carrossel__trilho" id="trilho-premios">
+        <article class="cartao premio">
+          <span class="premio__posicao">Prêmio máximo</span>
+          <div class="premio__figura">
+            <img src="imagens/premios/playstation5.webp" alt="Console PlayStation 5 Slim Edição Digital branco" loading="lazy">
+          </div>
+          <h3>Console PlayStation&reg; 5 Slim Edição Digital 825 Gb Branco - Sony</h3>
+        </article>
+
+        <article class="cartao premio">
+          <span class="premio__posicao">Prêmio especial</span>
+          <div class="premio__figura">
+            <img src="imagens/premios/bicicleta.webp" alt="Bicicleta elétrica Oggi Street Go S12" loading="lazy">
+          </div>
+          <h3>Bicicleta Elétrica Oggi Street Go S12 Tourney</h3>
+        </article>
+
+        <article class="cartao premio">
+          <span class="premio__posicao">Prêmio especial</span>
+          <div class="premio__figura">
+            <img src="imagens/premios/maquina-de-lavar.webp" alt="Máquina lava e seca Electrolux Inverter" loading="lazy">
+          </div>
+          <h3>Máquina Lava e Seca Electrolux 12kg Inverter</h3>
+        </article>
+
+        <article class="cartao premio">
+          <span class="premio__posicao">Prêmio especial</span>
+          <div class="premio__figura">
+            <img src="imagens/premios/televisao.webp" alt="Samsung Smart TV 55 polegadas MiniLED 4K" loading="lazy">
+          </div>
+          <h3>Samsung Smart TV 55" MiniLED 4K</h3>
+        </article>
+
+        <article class="cartao premio">
+          <span class="premio__posicao">Prêmio especial</span>
+          <div class="premio__figura">
+            <img src="imagens/premios/geladeira.webp" alt="Geladeira Electrolux Frost Free Duplex branca" loading="lazy">
+          </div>
+          <h3>Geladeira Electrolux Frost Free com AutoSense 480L Efficient Duplex Branca</h3>
+        </article>
+
+        <article class="cartao premio">
+          <span class="premio__posicao">Prêmio especial</span>
+          <div class="premio__figura">
+            <img src="imagens/premios/airfryer.webp" alt="Fritadeira Air Fryer Forno Oven 12L Mondial" loading="lazy">
+          </div>
+          <h3>Fritadeira Air Fryer Forno Oven 12L Mondial</h3>
+        </article>
+
+        <article class="cartao premio">
+          <span class="premio__posicao">Prêmio especial</span>
+          <div class="premio__figura">
+            <img src="imagens/premios/liquidificador.webp" alt="Liquidificador Philco 1500W com 6 lâminas" loading="lazy">
+          </div>
+          <h3>Liquidificador Philco 1500W 3,1L 12 Velocidades com 6 Lâminas</h3>
+        </article>
+      </div>
+
+      <div class="carrossel__pontos" id="pontos-premios"></div>
+
+      <p class="secao__nota">
+        A roleta também tem cupom de 10% OFF, cupom de frete grátis para uma compra no site,
+        R$ 50 em vale-compras e a fatia <strong>Gire de novo</strong>, que devolve os pontos.
+        Mas cuidado: duas fatias não premiam
+        &ndash; <strong>Não foi dessa vez</strong> e <strong>Perdeu 1 giro</strong>, que ainda tira
+        100 pontos do seu saldo. Cada produto só pode ser ganho uma vez: depois de sair, a fatia
+        dele vira <strong>Sem prêmio</strong>.
+        <a href="regulamento.html">Veja o regulamento completo</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================ COMO PARTICIPAR ============================ -->
+  <section class="secao">
+    <div class="container">
+      <h2 class="secao__titulo">Como participar</h2>
+      <p class="secao__subtitulo">Três passos, sem conta e sem pagar nada.</p>
+
+      <div class="grade-3">
+        <article class="cartao passo">
+          <div class="passo__numero">1</div>
+          <h3>Preencha seus dados</h3>
+          <p>Só nome e e-mail: é para lá que vão os códigos de desconto e o aviso de prêmio.</p>
+        </article>
+        <article class="cartao passo">
+          <div class="passo__numero">2</div>
+          <h3>Acumule pontos</h3>
+          <p>Perguntas sobre o Brasil, com 20 segundos cada. Responder rápido vale mais pontos.</p>
+        </article>
+        <article class="cartao passo">
+          <div class="passo__numero">3</div>
+          <h3>Gire a roleta</h3>
+          <p>Cada acerto já rende pelo menos um giro: são 100 pontos por giro, e cada acerto vale 100 ou mais.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ QUIZ ============================ -->
+  <section class="secao" id="participar">
+    <div class="container">
+      <div class="quiz">
+
+        <!-- --------------------- ETAPA 1: CADASTRO --------------------- -->
+        <section class="cartao painel" id="tela-cadastro">
+          <div class="medalha">?</div>
+          <h2>Bora começar?</h2>
+          <p>Preencha os dados abaixo para liberar as perguntas.</p>
+
+          <ul class="lista-checagem">
+            <li>10 perguntas, 20 segundos cada.</li>
+            <li>Cada acerto vale 100 pontos, mais bônus por rapidez.</li>
+            <li>A cada 100 pontos você libera um giro na roleta de prêmios.</li>
+            <li>Cada e-mail pode responder o quiz 3 vezes.</li>
+          </ul>
+
+          <div class="feedback" id="aviso-limite" role="status" hidden></div>
+
+          <form class="formulario" id="formulario-cadastro" novalidate>
+            <label class="campo" for="nome">
+              <span>Nome completo</span>
+              <input id="nome" name="nome" type="text" maxlength="60" autocomplete="name" placeholder="Como aparece no seu documento">
+              <span class="campo__erro">Digite seu nome completo.</span>
+            </label>
+
+            <label class="campo" for="email">
+              <span>E-mail</span>
+              <input id="email" name="email" type="email" maxlength="80" autocomplete="email" placeholder="voce@email.com">
+              <span class="campo__erro">Digite um e-mail válido.</span>
+            </label>
+
+            <label class="campo" for="telefone">
+              <span>Celular com DDD (opcional)</span>
+              <input id="telefone" name="telefone" type="tel" maxlength="16" autocomplete="tel" placeholder="(11) 90000-0000">
+              <span class="campo__erro">Digite um celular válido com DDD.</span>
+            </label>
+
+            <label class="aceite" for="aceite">
+              <input id="aceite" type="checkbox">
+              <span>Li e aceito o <a href="regulamento.html" target="_blank" rel="noopener">regulamento</a> da promoção e autorizo o envio dos prêmios e códigos de desconto para o meu e-mail.</span>
+            </label>
+            <p class="campo__erro" id="erro-aceite">É preciso aceitar o regulamento para participar.</p>
+
+            <button class="botao botao--principal botao--largo botao--grande" type="submit">Começar o quiz</button>
+          </form>
+        </section>
+
+        <!-- --------------------- ETAPA 2: PERGUNTAS --------------------- -->
+        <section id="tela-jogo" hidden>
+          <div class="quiz__barra-topo">
+            <span class="quiz__contagem">Pergunta <strong id="indice-atual">1</strong> de <span id="total-perguntas">10</span></span>
+            <span class="cronometro" id="cronometro">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>
+              </svg>
+              <span id="cronometro-valor">20</span>s
+            </span>
+          </div>
+
+          <div class="progresso"><div class="progresso__preenchido" id="progresso"></div></div>
+
+          <div class="cartao quiz__cartao">
+            <span class="quiz__categoria" id="categoria">Geografia</span>
+            <h2 class="quiz__pergunta" id="enunciado">Carregando...</h2>
+
+            <div class="alternativas" id="alternativas"></div>
+
+            <div class="feedback" id="feedback" hidden role="status"></div>
+
+            <div class="quiz__rodape">
+              <span class="quiz__pontos">Pontuação: <strong id="pontos">0</strong></span>
+              <button class="botao botao--principal" id="botao-proxima" type="button" disabled>Próxima pergunta</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- --------------------- ETAPA 3: RESULTADO --------------------- -->
+        <section class="cartao painel" id="tela-resultado" hidden>
+          <div class="medalha" id="resultado-icone">🏆</div>
+          <h2 id="resultado-titulo">Parabéns!</h2>
+          <p id="resultado-mensagem">Você mandou bem no Quiz Premiado.</p>
+
+          <p class="resultado__placar">
+            Você acertou <b id="resultado-acertos">0</b> de <b id="resultado-total">10</b> perguntas
+            e fez <b id="resultado-pontos">0</b> pontos.
+          </p>
+
+          <p class="resultado__rodadas" id="resultado-rodadas"></p>
+
+          <div class="cupom">
+            <small>Giros conquistados</small>
+            <div class="cupom__codigo" id="resultado-giros">0 giros</div>
+            <p id="resultado-saldo">Cada giro na roleta custa 100 pontos do seu saldo.</p>
+          </div>
+
+          <div class="acoes-centro">
+            <button class="botao botao--principal" id="botao-ir-roleta" type="button">Ir para a roleta</button>
+            <button class="botao botao--secundario" id="botao-repetir" type="button">Responder outra rodada</button>
+          </div>
+
+          <div class="ranking" id="ranking">
+            <h3>Ranking parcial da promoção</h3>
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Participante</th>
+                  <th>Acertos</th>
+                  <th>Pontos</th>
+                </tr>
+              </thead>
+              <tbody id="corpo-ranking"></tbody>
+            </table>
+          </div>
+
+          <div class="resumo" id="resumo"></div>
+        </section>
+
+        <!-- --------------------- ETAPA 4: ROLETA --------------------- -->
+        <section class="cartao painel" id="tela-roleta" hidden>
+          <h2>Roleta de prêmios</h2>
+          <p>A fatia que parar embaixo da seta é o seu prêmio. Cada giro custa 100 pontos do saldo.</p>
+
+          <div class="roleta__placar">
+            <div><b id="roleta-saldo">0</b><span>pontos no saldo</span></div>
+            <div><b id="roleta-giros">0</b><span>giros disponíveis</span></div>
+          </div>
+
+          <div class="roleta">
+            <div class="roleta__seta"></div>
+            <div class="roleta__disco" id="roleta-disco"></div>
+            <button class="roleta__centro" id="botao-girar" type="button">GIRAR</button>
+          </div>
+
+          <p class="roleta__aviso" id="roleta-aviso"></p>
+
+          <div class="roleta__resultado" id="roleta-resultado" role="status" hidden></div>
+
+          <div class="acoes-centro">
+            <button class="botao botao--secundario" id="botao-outra-rodada" type="button">Responder outra rodada</button>
+          </div>
+
+          <div class="premios-ganhos">
+            <h3>Seus prêmios</h3>
+            <ul id="lista-premios"></ul>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================ RODAPÉ ============================ -->
+<footer class="rodape">
+  <div class="container">
+    <img src="imagens/mercado-livre-seeklogo.svg" alt="Mercado Livre">
+    <ul class="rodape__links">
+      <li><a href="regulamento.html">Regulamento</a></li>
+      <li><a href="regulamento.html#duvidas">Dúvidas frequentes</a></li>
+      <li><a href="#">Política de privacidade</a></li>
+      <li><a href="#">Termos e condições</a></li>
+      <li><a href="mailto:quizpremiado@mercadolivre.com.br">Fale com a gente</a></li>
+    </ul>
+    <p>Promoção válida de 01/09/2026 a 15/09/2026. Participação gratuita, sem necessidade de compra.</p>
+    <p>Copyright © 1999-2026 Ebazar.com.br LTDA. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<script src="js/comum.js" charset="UTF-8"></script>
+<script src="js/perguntas.js" charset="UTF-8"></script>
+<script src="js/ranking.js" charset="UTF-8"></script>
+<script src="js/roleta.js" charset="UTF-8"></script>
+<script src="js/quiz.js" charset="UTF-8"></script>
+</body>
+</html>

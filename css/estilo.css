@@ -1,0 +1,591 @@
+/* ==========================================================================
+   Quiz Premiado - Mercado Livre
+   Landing exclusiva do evento (pagina unica, sem navegacao de loja)
+   ========================================================================== */
+
+:root {
+  --amarelo: #FFE600;
+  --branco: #FFFFFF;
+  --verde: #00A650;
+  --azul: #2968C8;
+  --azul-claro: #D9E7FA;
+  --cinza-bg: #EDEDED;
+
+  --azul-escuro: #1A3B7C;
+  --azul-hover: #1F55A8;
+  --texto: rgba(0, 0, 0, .9);
+  --texto-medio: rgba(0, 0, 0, .55);
+  --texto-fraco: rgba(0, 0, 0, .35);
+  --linha: rgba(0, 0, 0, .1);
+  --vermelho: #F23D4F;
+
+  --sombra: 0 1px 2px 0 rgba(0, 0, 0, .12);
+  --sombra-alta: 0 8px 24px 0 rgba(0, 0, 0, .12);
+  --raio: 8px;
+  --container: 1100px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--cinza-bg);
+  color: var(--texto);
+  font-family: "Proxima Nova", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+img { max-width: 100%; display: block; }
+a { color: var(--azul); text-decoration: none; }
+a:hover { color: var(--azul-hover); }
+button { font-family: inherit; }
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.visualmente-oculto {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ============================ TOPO ====================================== */
+/* Barra minima: so a marca e o selo da promocao. Sem menu, busca ou conta. */
+
+.topo {
+  background: var(--amarelo);
+  padding: 12px 0;
+}
+.topo__conteudo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.topo__logo { width: 124px; height: auto; }
+
+/* Faixa do nome da campanha: atravessa a tela inteira, então cabe em uma
+   linha no celular sem disputar espaço com a logo. */
+.faixa-campanha {
+  background: var(--azul-escuro);
+  color: var(--branco);
+  text-align: center;
+  font-size: 12px; font-weight: 700; line-height: 1.3;
+  text-transform: uppercase; letter-spacing: .6px;
+  padding: 9px 0;
+}
+
+/* ============================ BANNER ==================================== */
+
+.banner { background: var(--amarelo); padding: 0 0 24px; }
+.banner__botao {
+  display: block; width: 100%;
+  border: 0; padding: 0; background: none; cursor: pointer;
+  border-radius: var(--raio); overflow: hidden;
+  box-shadow: var(--sombra-alta);
+  transition: transform .2s ease;
+}
+.banner__botao:hover { transform: translateY(-2px); }
+.banner__botao img { width: 100%; height: auto; }
+
+/* Cartao de chamada que sobe por cima do banner */
+.chamada {
+  background: var(--branco);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-alta);
+  padding: 24px;
+  margin: -32px auto 0;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+}
+.chamada__texto h1 { font-size: 26px; margin: 0 0 6px; }
+.chamada__texto p { margin: 0; color: var(--texto-medio); }
+.chamada__acao { display: grid; gap: 10px; justify-items: center; }
+.chamada__aviso { font-size: 12px; color: var(--texto-fraco); }
+
+.contador { display: flex; gap: 8px; margin-top: 14px; }
+.contador div {
+  background: var(--cinza-bg); border-radius: 6px;
+  padding: 8px 12px; min-width: 58px; text-align: center;
+}
+.contador b { display: block; font-size: 20px; line-height: 1.1; }
+.contador span { font-size: 11px; color: var(--texto-medio); }
+
+/* ============================ BOTOES ==================================== */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--raio);
+  padding: 13px 26px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .15s ease;
+  text-align: center;
+}
+.botao--principal { background: var(--azul); color: var(--branco); }
+.botao--principal:hover { background: var(--azul-hover); color: var(--branco); }
+.botao--secundario { background: var(--azul-claro); color: var(--azul); }
+.botao--secundario:hover { background: #C7DBF7; color: var(--azul); }
+.botao--largo { width: 100%; }
+.botao--grande { padding: 16px 36px; font-size: 18px; }
+.botao:disabled { background: rgba(0, 0, 0, .1); color: var(--texto-fraco); cursor: not-allowed; }
+
+/* ============================ SECOES ==================================== */
+
+.cartao {
+  background: var(--branco);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+
+.secao { padding: 40px 0; }
+.secao__titulo { font-size: 24px; font-weight: 700; margin: 0 0 4px; text-align: center; }
+.secao__subtitulo { color: var(--texto-medio); margin: 0 0 28px; text-align: center; }
+.secao__nota {
+  text-align: center; color: var(--texto-medio); font-size: 14px;
+  margin: 20px auto 0; max-width: 60ch;
+}
+.secao__nota strong { color: var(--texto); }
+
+.grade-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.premios-grade { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+/* Premios ---------------------------------------------------------------- */
+.premio {
+  padding: 16px;
+  display: flex; flex-direction: column;
+  text-align: center;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.premio:hover { box-shadow: var(--sombra-alta); transform: translateY(-2px); }
+.premio__posicao {
+  align-self: center;
+  background: var(--amarelo); color: var(--azul-escuro);
+  font-size: 12px; font-weight: 700;
+  padding: 4px 12px; border-radius: 40px;
+  margin-bottom: 10px;
+}
+.premio__figura {
+  height: 165px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.premio__figura img { max-height: 100%; width: auto; object-fit: contain; }
+.premio h3 { font-size: 15px; line-height: 1.35; margin: 0 0 8px; font-weight: 600; }
+/* O nome é a última linha do cartão: encostado no fim, alinha a base de todos
+   mesmo com nomes de produto de tamanhos bem diferentes. */
+.premio h3 { margin-top: auto; }
+
+/* Carrossel (só no mobile) ------------------------------------------------ */
+/* No desktop a grade fica como está; abaixo de 720px os cartões viram uma
+   faixa horizontal com encaixe, e os pontos aparecem para indicar a posição. */
+
+.carrossel__pontos { display: none; justify-content: center; gap: 8px; margin-top: 16px; }
+.carrossel__ponto {
+  width: 8px; height: 8px; padding: 0;
+  border: 0; border-radius: 50%;
+  background: rgba(0, 0, 0, .2);
+  cursor: pointer;
+  transition: width .2s ease, background-color .2s ease;
+}
+.carrossel__ponto--ativo { width: 22px; border-radius: 4px; background: var(--azul); }
+
+@media (max-width: 720px) {
+  .premios-grade.carrossel__trilho {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 12px;
+    /* sangra até a borda da tela para o próximo cartão aparecer espiando */
+    margin: 0 -16px;
+    padding: 8px 16px 10px;
+    scroll-padding-left: 16px;
+  }
+  .premios-grade.carrossel__trilho::-webkit-scrollbar { display: none; }
+  .premios-grade.carrossel__trilho > .premio {
+    flex: 0 0 74%;
+    scroll-snap-align: start;
+  }
+  .carrossel__pontos { display: flex; }
+}
+
+/* Passos ----------------------------------------------------------------- */
+.passo { padding: 24px; text-align: center; }
+.passo__numero {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--azul-claro); color: var(--azul);
+  font-weight: 700; font-size: 19px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+.passo h3 { font-size: 16px; margin: 0 0 6px; }
+.passo p { color: var(--texto-medio); margin: 0; font-size: 14px; }
+
+/* Regulamento e FAQ ------------------------------------------------------ */
+.regras { padding: 24px 28px; }
+.regras ol { margin: 0; padding-left: 20px; color: rgba(0, 0, 0, .75); }
+.regras li { margin-bottom: 10px; }
+
+.faq__item { border-bottom: 1px solid var(--linha); }
+.faq__item:last-child { border-bottom: 0; }
+.faq__pergunta {
+  width: 100%; text-align: left; background: none; border: 0;
+  padding: 16px 28px; font-size: 15px; font-weight: 600; color: var(--texto);
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+}
+.faq__pergunta:hover { color: var(--azul); }
+.faq__pergunta::after { content: "+"; font-size: 20px; font-weight: 400; color: var(--azul); }
+.faq__pergunta[aria-expanded="true"]::after { content: "\2013"; }
+.faq__resposta { padding: 0 28px 18px; color: var(--texto-medio); margin: 0; max-width: 80ch; }
+.faq__resposta[hidden] { display: none; }
+
+/* ============================ QUIZ ====================================== */
+
+.quiz { max-width: 720px; margin: 0 auto; }
+
+.quiz__barra-topo {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 12px;
+}
+.quiz__contagem { font-size: 13px; color: var(--texto-medio); }
+.quiz__contagem strong { color: var(--texto); font-size: 15px; }
+
+.cronometro {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--branco); border-radius: 40px;
+  padding: 6px 14px; font-weight: 700; font-size: 15px;
+  box-shadow: var(--sombra);
+}
+.cronometro--alerta { color: var(--vermelho); }
+
+.progresso {
+  height: 6px; background: var(--branco); border-radius: 3px;
+  overflow: hidden; margin-bottom: 20px; box-shadow: var(--sombra);
+}
+.progresso__preenchido {
+  height: 100%; width: 0%;
+  background: var(--verde);
+  transition: width .3s ease;
+}
+
+.quiz__cartao { padding: 28px; }
+.quiz__categoria {
+  display: inline-block;
+  background: var(--azul-claro); color: var(--azul);
+  font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+  padding: 4px 8px; border-radius: 2px; margin-bottom: 14px;
+}
+.quiz__pergunta { font-size: 22px; line-height: 1.3; margin: 0 0 22px; font-weight: 700; }
+
+.alternativas { display: grid; gap: 10px; margin-bottom: 20px; }
+.alternativa {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; text-align: left;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  padding: 14px 16px;
+  font-size: 15px; color: var(--texto);
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.alternativa:hover:not(:disabled) { border-color: var(--azul); background: var(--azul-claro); }
+.alternativa__letra {
+  flex: 0 0 auto;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--cinza-bg); color: var(--texto-medio);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+}
+.alternativa:hover:not(:disabled) .alternativa__letra { background: var(--branco); color: var(--azul); }
+.alternativa:disabled { cursor: default; }
+
+.alternativa--certa { border-color: var(--verde); background: rgba(0, 166, 80, .08); }
+.alternativa--certa .alternativa__letra { background: var(--verde); color: var(--branco); }
+.alternativa--errada { border-color: var(--vermelho); background: rgba(242, 61, 79, .07); }
+.alternativa--errada .alternativa__letra { background: var(--vermelho); color: var(--branco); }
+.alternativa--apagada { opacity: .55; }
+
+.feedback {
+  border-radius: var(--raio);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  border-left: 4px solid;
+}
+.feedback--certo { background: rgba(0, 166, 80, .08); border-color: var(--verde); }
+.feedback--errado { background: rgba(242, 61, 79, .07); border-color: var(--vermelho); }
+.feedback strong { display: block; margin-bottom: 2px; }
+.feedback[hidden] { display: none; }
+
+.quiz__rodape { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.quiz__pontos { font-size: 14px; color: var(--texto-medio); }
+.quiz__pontos strong { color: var(--verde); font-size: 18px; }
+
+/* Cadastro e resultado --------------------------------------------------- */
+.painel { padding: 32px; text-align: center; }
+.painel h2 { font-size: 24px; margin: 0 0 8px; }
+.painel > p { color: var(--texto-medio); margin: 0 auto 24px; max-width: 52ch; }
+
+.formulario { max-width: 380px; margin: 0 auto; text-align: left; }
+.campo { display: block; margin-bottom: 16px; }
+.campo > span:first-child { display: block; font-size: 13px; color: var(--texto-medio); margin-bottom: 4px; }
+.campo input[type="text"],
+.campo input[type="email"],
+.campo input[type="tel"] {
+  width: 100%; padding: 12px 14px; font-size: 15px;
+  border: 1px solid rgba(0, 0, 0, .25); border-radius: var(--raio);
+  outline: 0; background: var(--branco); color: var(--texto);
+}
+.campo input:focus { border-color: var(--azul); box-shadow: 0 0 0 3px var(--azul-claro); }
+.campo--erro input { border-color: var(--vermelho); }
+.campo__erro { display: none; color: var(--vermelho); font-size: 12px; margin-top: 4px; }
+.campo--erro .campo__erro { display: block; }
+.campo__erro--visivel { display: block; }
+#erro-aceite { margin: -12px 0 16px; }
+
+.aceite { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--texto-medio); margin-bottom: 20px; }
+.aceite input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--azul); }
+
+.lista-checagem {
+  list-style: none; margin: 0 auto 24px; padding: 0;
+  text-align: left; display: grid; gap: 10px; max-width: 380px;
+}
+.lista-checagem li { display: flex; gap: 10px; align-items: flex-start; color: rgba(0, 0, 0, .75); font-size: 14px; }
+.lista-checagem li::before { content: "\2713"; color: var(--verde); font-weight: 700; flex: 0 0 auto; }
+
+.medalha {
+  width: 96px; height: 96px; border-radius: 50%;
+  background: var(--amarelo);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 42px; font-weight: 700;
+  margin: 0 auto 16px;
+}
+.resultado__placar { font-size: 15px; color: var(--texto-medio); margin-bottom: 8px; }
+.resultado__rodadas { font-size: 13px; color: var(--texto-medio); margin: 0 0 20px; }
+.resultado__placar b { color: var(--texto); font-size: 22px; }
+
+.cupom {
+  background: var(--azul-claro);
+  border: 1px dashed var(--azul);
+  border-radius: var(--raio);
+  padding: 16px;
+  margin: 0 0 20px;
+}
+.cupom small { color: var(--azul); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; font-size: 11px; }
+.cupom__codigo { font-size: 26px; font-weight: 700; letter-spacing: 3px; color: var(--azul); margin: 6px 0 2px; }
+.cupom p { margin: 0; color: var(--texto-medio); font-size: 13px; }
+
+.acoes-centro { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+.resumo { text-align: left; margin-top: 28px; }
+.resumo h3 { font-size: 16px; margin: 0 0 12px; }
+.resumo__item { border-top: 1px solid var(--linha); padding: 12px 0; }
+.resumo__item p { margin: 0 0 4px; font-weight: 600; font-size: 14px; }
+.resumo__item small { color: var(--texto-medio); display: block; }
+.resumo__marca { font-weight: 700; margin-right: 6px; }
+.resumo__marca--certa { color: var(--verde); }
+.resumo__marca--errada { color: var(--vermelho); }
+
+/* ============================ ROLETA ==================================== */
+
+.roleta__placar {
+  display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.roleta__placar div {
+  background: var(--cinza-bg); border-radius: var(--raio);
+  padding: 10px 20px; min-width: 130px;
+}
+.roleta__placar b { display: block; font-size: 24px; line-height: 1.1; color: var(--azul-escuro); }
+.roleta__placar span { font-size: 12px; color: var(--texto-medio); }
+
+.roleta {
+  position: relative;
+  width: 320px; height: 320px;
+  margin: 0 auto 16px;
+}
+
+/* Ponteiro fixo no topo: a fatia que parar embaixo dele é a premiada. */
+.roleta__seta {
+  position: absolute; top: -6px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 24px solid var(--azul-escuro);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .25));
+  z-index: 3;
+}
+
+.roleta__disco {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 8px solid var(--amarelo);
+  box-shadow: var(--sombra-alta), inset 0 0 0 2px rgba(0, 0, 0, .08);
+  overflow: hidden;
+  transition: transform 4.5s cubic-bezier(.16, .84, .28, 1);
+}
+
+/* O rótulo é escrito no sentido do raio: assim o texto usa o comprimento da
+   fatia, e não a largura estreita perto do centro. A conta é: gira até o meio
+   da fatia, empurra para fora e vira o texto 90 graus. */
+.roleta__setor {
+  --distancia: 100px;
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 100px;
+  text-align: center;
+  pointer-events: none;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--angulo))
+    translateY(calc(var(--distancia) * -1))
+    rotate(-90deg);
+}
+.roleta__setor span {
+  display: block;
+  font-size: 10px; font-weight: 700; line-height: 1.15;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, .18);
+}
+
+.roleta__centro {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 92px; height: 92px;
+  border-radius: 50%;
+  border: 4px solid var(--amarelo);
+  background: var(--branco);
+  color: var(--azul);
+  font-size: 15px; font-weight: 700; letter-spacing: .5px;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
+  z-index: 2;
+  transition: transform .15s ease, background-color .15s ease;
+}
+.roleta__centro:hover:not(:disabled) { background: var(--azul); color: var(--branco); transform: translate(-50%, -50%) scale(1.05); }
+.roleta__centro:disabled { color: var(--texto-fraco); cursor: not-allowed; background: var(--branco); }
+
+.roleta__aviso { font-size: 13px; color: var(--texto-medio); margin: 0 0 20px; }
+
+.roleta__resultado {
+  border-radius: var(--raio);
+  padding: 18px;
+  margin-bottom: 20px;
+  border: 1px solid var(--linha);
+  background: var(--cinza-bg);
+}
+.roleta__resultado[hidden] { display: none; }
+.roleta__resultado strong { display: block; font-size: 18px; margin-bottom: 4px; }
+.roleta__resultado p { margin: 0; color: var(--texto-medio); font-size: 14px; }
+.roleta__resultado--produto { background: rgba(41, 104, 200, .08); border-color: var(--azul); }
+.roleta__resultado--cupom { background: var(--azul-claro); border-color: var(--azul-claro); }
+.roleta__resultado--bonus { background: rgba(0, 166, 80, .1); border-color: var(--verde); }
+.roleta__resultado--nada { background: var(--cinza-bg); border-color: rgba(0, 0, 0, .18); }
+.roleta__resultado--perde { background: rgba(242, 61, 79, .08); border-color: var(--vermelho); }
+.roleta__resultado-figura { height: 120px; margin-bottom: 10px; display: flex; justify-content: center; }
+.roleta__resultado-figura img { max-height: 100%; width: auto; }
+.roleta__resultado-contato { margin-top: 8px !important; font-size: 12px !important; }
+
+.premios-ganhos { text-align: left; margin-top: 24px; }
+.premios-ganhos h3 { font-size: 16px; margin: 0 0 10px; }
+.premios-ganhos ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.premios-ganhos li {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--cinza-bg); border-radius: var(--raio);
+  padding: 10px 14px; font-size: 14px;
+}
+.premios-ganhos__status {
+  flex: 0 0 auto;
+  color: var(--verde); font-weight: 600; font-size: 12px;
+  background: var(--branco); border-radius: 4px; padding: 3px 8px;
+}
+.premios-ganhos li.premios-ganhos__vazio {
+  background: none; padding: 0;
+  color: var(--texto-medio); font-size: 14px;
+}
+
+/* Ranking ---------------------------------------------------------------- */
+.ranking { margin-top: 28px; text-align: left; }
+.ranking h3 { font-size: 16px; margin: 0 0 12px; }
+.tabela { width: 100%; border-collapse: collapse; }
+.tabela th, .tabela td { padding: 12px; text-align: left; border-bottom: 1px solid var(--linha); font-size: 14px; }
+.tabela th { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--texto-medio); font-weight: 600; }
+.tabela tr:last-child td { border-bottom: 0; }
+.tabela td:last-child, .tabela th:last-child { text-align: right; }
+.tabela tr.eu { background: var(--azul-claro); }
+.tabela tr.eu td { font-weight: 600; }
+.posicao {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--cinza-bg); font-weight: 700; font-size: 13px;
+}
+.posicao--1 { background: var(--amarelo); }
+.posicao--2, .posicao--3 { background: var(--azul-claro); color: var(--azul); }
+
+/* ============================ RODAPE ==================================== */
+
+.rodape {
+  background: var(--branco);
+  border-top: 1px solid var(--linha);
+  padding: 28px 0;
+  margin-top: 40px;
+  text-align: center;
+}
+.rodape img { width: 108px; margin: 0 auto 14px; }
+.rodape__links {
+  display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: center;
+  list-style: none; margin: 0 0 14px; padding: 0;
+}
+.rodape__links a { font-size: 13px; color: var(--texto-medio); }
+.rodape__links a:hover { color: var(--azul); }
+.rodape p { color: var(--texto-fraco); font-size: 12px; margin: 0 0 4px; }
+
+/* ============================ RESPONSIVO ================================ */
+
+@media (max-width: 900px) {
+  .premios-grade { grid-template-columns: repeat(2, 1fr); }
+  .chamada { grid-template-columns: 1fr; text-align: center; }
+  .contador { justify-content: center; }
+  .chamada__acao { justify-items: stretch; }
+}
+
+@media (max-width: 620px) {
+  .topo__logo { width: 110px; }
+  .faixa-campanha { font-size: 10px; letter-spacing: .3px; padding: 8px 0; }
+  .grade-3 { grid-template-columns: 1fr; }
+  .banner { padding-bottom: 16px; }
+  .chamada { margin-top: -16px; padding: 20px; }
+  .chamada__texto h1 { font-size: 21px; }
+  .quiz__pergunta { font-size: 19px; }
+  .quiz__cartao, .painel { padding: 20px; }
+  .quiz__rodape { flex-direction: column-reverse; align-items: stretch; }
+  .premio__figura { height: 150px; }
+  .secao { padding: 28px 0; }
+  .roleta { width: 260px; height: 260px; }
+  .roleta__setor { --distancia: 80px; width: 80px; }
+  .roleta__setor span { font-size: 9px; }
+  .roleta__centro { width: 76px; height: 76px; font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .roleta__disco { transition-duration: .6s; }
+}
