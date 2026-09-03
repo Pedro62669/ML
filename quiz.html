@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz e roleta | Quiz Premiado Mercado Livre</title>
+<meta name="description" content="Responda as 10 perguntas do Quiz Premiado: cada acerto vale um giro na roleta de prêmios.">
+<link rel="icon" href="imagens/mercado-livre-seeklogo.svg">
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+<!-- ============================ TOPO ============================ -->
+<header class="topo">
+  <div class="container topo__conteudo">
+    <a href="index.html"><img class="topo__logo" src="imagens/mercado-livre-seeklogo.svg" alt="Mercado Livre"></a>
+  </div>
+</header>
+
+<!-- Faixa com o nome da campanha, logo abaixo da marca -->
+<div class="faixa-campanha">
+  <div class="container">Promoção Mês da Independência Mercado Livre</div>
+</div>
+
+<main>
+  <!-- ============================ QUIZ ============================ -->
+  <section class="secao" id="participar">
+    <div class="container">
+      <div class="quiz">
+
+        <!-- --------------------- ETAPA 1: CADASTRO --------------------- -->
+        <section class="cartao painel" id="tela-cadastro">
+          <div class="medalha">?</div>
+          <h2>Bora começar?</h2>
+          <p>Preencha os dados abaixo para liberar as perguntas.</p>
+
+          <ul class="lista-checagem">
+            <li>10 perguntas, 20 segundos cada.</li>
+            <li>Cada resposta certa vale 1 giro na roleta de prêmios.</li>
+            <li>Errar ou deixar o tempo acabar não tira giro, só não rende.</li>
+            <li>Uma participação por e-mail &ndash; giros extras vêm de compartilhar o link.</li>
+          </ul>
+
+          <div class="feedback" id="aviso-limite" role="status" hidden></div>
+
+          <form class="formulario" id="formulario-cadastro" novalidate>
+            <label class="campo" for="nome">
+              <span>Nome completo</span>
+              <input id="nome" name="nome" type="text" maxlength="60" autocomplete="name" placeholder="Como aparece no seu documento">
+              <span class="campo__erro">Digite seu nome completo.</span>
+            </label>
+
+            <label class="campo" for="email">
+              <span>E-mail</span>
+              <input id="email" name="email" type="email" maxlength="80" autocomplete="email" placeholder="voce@email.com">
+              <span class="campo__erro">Digite um e-mail válido.</span>
+            </label>
+
+            <label class="campo" for="telefone">
+              <span>Celular com DDD (opcional)</span>
+              <input id="telefone" name="telefone" type="tel" maxlength="16" autocomplete="tel" placeholder="(11) 90000-0000">
+              <span class="campo__erro">Digite um celular válido com DDD.</span>
+            </label>
+
+            <label class="aceite" for="aceite">
+              <input id="aceite" type="checkbox">
+              <span>Li e aceito o <a href="regulamento.html" target="_blank" rel="noopener">regulamento</a> da promoção e autorizo o envio dos prêmios e códigos de desconto para o meu e-mail.</span>
+            </label>
+            <p class="campo__erro" id="erro-aceite">É preciso aceitar o regulamento para participar.</p>
+
+            <button class="botao botao--principal botao--largo botao--grande" type="submit">Começar o quiz</button>
+          </form>
+        </section>
+
+        <!-- --------------------- ETAPA 2: PERGUNTAS --------------------- -->
+        <section id="tela-jogo" hidden>
+          <div class="quiz__barra-topo">
+            <span class="quiz__contagem">Pergunta <strong id="indice-atual">1</strong> de <span id="total-perguntas">10</span></span>
+            <span class="cronometro" id="cronometro">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>
+              </svg>
+              <span id="cronometro-valor">20</span>s
+            </span>
+          </div>
+
+          <div class="progresso"><div class="progresso__preenchido" id="progresso"></div></div>
+
+          <div class="cartao quiz__cartao">
+            <span class="quiz__categoria" id="categoria">Geografia</span>
+            <h2 class="quiz__pergunta" id="enunciado">Carregando...</h2>
+
+            <div class="alternativas" id="alternativas"></div>
+
+            <div class="feedback" id="feedback" hidden role="status"></div>
+
+            <div class="quiz__rodape">
+              <span class="quiz__giros">Giros: <strong id="giros-da-rodada">0</strong></span>
+              <button class="botao botao--principal" id="botao-proxima" type="button" disabled>Próxima pergunta</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- --------------------- ETAPA 3: RESULTADO --------------------- -->
+        <section class="cartao painel" id="tela-resultado" hidden>
+          <div class="medalha" id="resultado-icone">🏆</div>
+          <h2 id="resultado-titulo">Parabéns!</h2>
+          <p id="resultado-mensagem">Você mandou bem no Quiz Premiado.</p>
+
+          <p class="resultado__placar">
+            Você acertou <b id="resultado-acertos">0</b> de <b id="resultado-total">10</b> perguntas.
+          </p>
+
+          <div class="cupom">
+            <small>Giros conquistados</small>
+            <div class="cupom__codigo" id="resultado-giros">0 giros</div>
+            <p id="resultado-giros-disponiveis">Cada resposta certa vale um giro na roleta.</p>
+          </div>
+
+          <p class="resultado__rodadas" id="resultado-rodadas"></p>
+
+          <!-- O convite para compartilhar mora aqui e é levado para a roleta quando ela abre -->
+          <div id="compartilhar-no-resultado">
+            <div class="compartilhar" id="bloco-compartilhar">
+              <h3>Quer ganhar mais giros?</h3>
+              <p>O quiz é uma vez só, mas cada rede abaixo vale 1 giro extra &ndash; uma vez em cada uma.</p>
+              <div class="compartilhar__botoes" id="compartilhar-botoes"></div>
+              <p class="compartilhar__aviso" id="compartilhar-aviso" role="status" hidden></p>
+              <p class="compartilhar__contador" id="compartilhar-contador"></p>
+            </div>
+          </div>
+
+          <div class="acoes-centro">
+            <button class="botao botao--principal" id="botao-ir-roleta" type="button">Ir para a roleta</button>
+          </div>
+
+          <div class="ranking" id="ranking">
+            <h3>Ranking parcial da promoção</h3>
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Participante</th>
+                  <th>Acertos</th>
+                  <th>Giros</th>
+                </tr>
+              </thead>
+              <tbody id="corpo-ranking"></tbody>
+            </table>
+          </div>
+
+          <div class="resumo" id="resumo"></div>
+        </section>
+
+        <!-- --------------------- ETAPA 4: ROLETA --------------------- -->
+        <section class="cartao painel" id="tela-roleta" hidden>
+          <h2>Roleta de prêmios</h2>
+          <p>A fatia que parar embaixo da seta é o seu prêmio. Cada giro vale uma rodada na roda.</p>
+
+          <div class="roleta__placar">
+            <div><b id="roleta-giros">0</b><span>giros disponíveis</span></div>
+          </div>
+
+          <div class="roleta">
+            <div class="roleta__seta"></div>
+            <div class="roleta__disco" id="roleta-disco"></div>
+            <button class="roleta__centro" id="botao-girar" type="button">GIRAR</button>
+          </div>
+
+          <p class="roleta__aviso" id="roleta-aviso"></p>
+
+          <div class="roleta__resultado" id="roleta-resultado" role="status" hidden></div>
+
+          <div id="compartilhar-na-roleta"></div>
+
+          <div class="premios-ganhos">
+            <h3>Seus prêmios</h3>
+            <div id="lista-premios"></div>
+          </div>
+        </section>
+
+        <!-- --------------------- ETAPA 5: RESGATE --------------------- -->
+        <section class="cartao painel" id="tela-resgate" hidden>
+
+          <!-- endereço de entrega -->
+          <div id="resgate-entrega">
+            <h2>Resgate do seu prêmio</h2>
+            <p>Informe o endereço de entrega. O frete é calculado pelo CEP e pago por você.</p>
+
+            <div class="resgate__produto">
+              <img id="resgate-imagem" src="" alt="">
+              <div>
+                <small>Prêmio a resgatar</small>
+                <strong id="resgate-nome"></strong>
+              </div>
+            </div>
+
+            <form class="formulario" id="formulario-entrega" novalidate>
+              <label class="campo" for="cep">
+                <span>CEP</span>
+                <input id="cep" type="text" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000">
+                <span class="campo__erro">Digite um CEP com 8 dígitos.</span>
+              </label>
+
+              <label class="campo" for="endereco">
+                <span>Endereço</span>
+                <input id="endereco" type="text" maxlength="80" autocomplete="street-address" placeholder="Rua, avenida...">
+                <span class="campo__erro">Digite o endereço.</span>
+              </label>
+
+              <label class="campo" for="numero">
+                <span>Número</span>
+                <input id="numero" type="text" maxlength="10" placeholder="123">
+                <span class="campo__erro">Digite o número.</span>
+              </label>
+
+              <label class="campo" for="complemento">
+                <span>Complemento (opcional)</span>
+                <input id="complemento" type="text" maxlength="40" placeholder="Apto, bloco...">
+              </label>
+
+              <label class="campo" for="cidade">
+                <span>Cidade</span>
+                <input id="cidade" type="text" maxlength="50" placeholder="Sua cidade">
+                <span class="campo__erro">Digite a cidade.</span>
+              </label>
+
+              <label class="campo" for="uf">
+                <span>Estado (UF)</span>
+                <input id="uf" type="text" maxlength="2" placeholder="SP">
+                <span class="campo__erro">Digite a sigla do estado.</span>
+              </label>
+
+              <button class="botao botao--principal botao--largo botao--grande" type="submit">Continuar</button>
+            </form>
+          </div>
+
+          <!-- oferta de seguro -->
+          <div class="seguro" id="resgate-seguro" hidden>
+            <h2>Adicione um seguro</h2>
+            <p>Estenda a garantia de fábrica por mais tempo e proteja seu produto contra falhas mecânicas.</p>
+            <p class="seguro__detalhes"><a href="regulamento.html">Ver detalhes</a></p>
+
+            <div class="seguro__alvo">
+              <span class="seguro__miniatura">
+                <img id="seguro-imagem" src="" alt="">
+                <svg class="seguro__conferido" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="12"></circle>
+                  <path d="M6.5 12.5l3.5 3.5 7.5-7.5" fill="none" stroke="#FFFFFF" stroke-width="2.4"
+                        stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </span>
+              <span class="seguro__alvo-texto">
+                <small>Garantia Estendida para:</small>
+                <strong id="seguro-produto"></strong>
+              </span>
+            </div>
+
+            <div class="seguro__opcoes" id="seguro-opcoes"></div>
+
+            <div class="seguro__rodape">
+              <p class="seguro__termos">
+                Ao adicionar, você aceita as <a href="regulamento.html">Condições gerais</a>
+                e os <a href="regulamento.html">Termos de cobrança do Prêmio do seguro</a>.
+              </p>
+              <div class="seguro__acoes">
+                <button class="botao botao--secundario" id="botao-pular-seguro" type="button">Agora não</button>
+                <button class="botao botao--principal" id="botao-adicionar-seguro" type="button">Adicionar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- espera entre o seguro e o checkout -->
+          <div class="carregando" id="resgate-carregando" hidden role="status" aria-live="polite">
+            <p class="carregando__texto">Preparando tudo para sua compra</p>
+            <div class="carregando__circulo" aria-hidden="true"></div>
+          </div>
+
+          <!-- checkout do frete e do seguro -->
+          <div id="resgate-checkout" hidden>
+            <h2>Finalize sua compra</h2>
+
+            <div class="checkout">
+              <div class="checkout__coluna">
+
+                <div class="checkout__produto">
+                  <img id="checkout-imagem" src="" alt="">
+                  <span class="checkout__produto-texto">
+                    <strong id="checkout-nome"></strong>
+                    <small>Prêmio da promoção</small>
+                  </span>
+                </div>
+
+                <div class="checkout__bloco">
+                  <h3>Forma de entrega</h3>
+
+                  <div class="checkout__abas">
+                    <div class="checkout__aba checkout__aba--ativa">
+                      <b>Frete</b>
+                      <small id="aba-frete-valor">R$ 0,00</small>
+                    </div>
+                  </div>
+
+                  <div class="checkout__endereco">
+                    <svg class="checkout__pino" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"></path>
+                      <circle cx="12" cy="9" r="2.6" fill="#FFFFFF"></circle>
+                    </svg>
+                    <span class="checkout__endereco-texto">
+                      <span id="checkout-endereco"></span>
+                      <button class="checkout__link" id="botao-alterar-endereco" type="button">Alterar endereço</button>
+                    </span>
+                  </div>
+
+                  <div class="checkout__envio">
+                    <div class="checkout__envio-titulo">
+                      <strong>Envio 1</strong>
+                      <span class="checkout__selo-full">FULL</span>
+                    </div>
+                    <label class="checkout__opcao-envio">
+                      <input type="radio" name="opcao-envio" checked>
+                      <span id="checkout-prazo"></span>
+                      <span class="checkout__envio-preco" id="checkout-envio-preco"></span>
+                    </label>
+                    <small class="checkout__envio-nota">Única opção disponível</small>
+                  </div>
+                </div>
+
+                <div class="checkout__bloco">
+                  <h3>Meios de pagamento</h3>
+                  <div class="checkout__pagamentos" id="checkout-pagamentos"></div>
+                </div>
+
+              </div>
+
+              <aside class="checkout__resumo">
+                <h3>Resumo da compra</h3>
+                <dl id="checkout-linhas"></dl>
+                <div class="checkout__total">
+                  <span>Total</span>
+                  <strong id="checkout-total">R$ 0,00</strong>
+                </div>
+                <p class="checkout__economia" id="checkout-economia"></p>
+                <button class="botao botao--principal botao--largo" id="botao-pagar" type="button">Pagar e finalizar</button>
+                <button class="checkout__voltar" id="botao-voltar-seguro" type="button">Voltar para o seguro</button>
+              </aside>
+            </div>
+          </div>
+
+          <!-- confirmação -->
+          <div id="resgate-fim" hidden>
+            <div class="medalha">&#10003;</div>
+            <h2>Resgate concluído</h2>
+            <p id="resgate-resumo"></p>
+            <div class="acoes-centro">
+              <button class="botao botao--principal" id="botao-voltar-roleta" type="button">Voltar para a roleta</button>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================ RODAPÉ ============================ -->
+<footer class="rodape">
+  <div class="container">
+    <img src="imagens/mercado-livre-seeklogo.svg" alt="Mercado Livre">
+    <ul class="rodape__links">
+      <li><a href="index.html">Página da promoção</a></li>
+      <li><a href="regulamento.html">Regulamento</a></li>
+      <li><a href="regulamento.html#duvidas">Dúvidas frequentes</a></li>
+      <li><a href="#">Política de privacidade</a></li>
+      <li><a href="#">Termos e condições</a></li>
+      <li><a href="mailto:quizpremiado@mercadolivre.com.br">Fale com a gente</a></li>
+    </ul>
+    <p>Promoção válida de 01/09/2026 a 15/09/2026. Participação gratuita, sem necessidade de compra.</p>
+    <p>Copyright © 1999-2026 Ebazar.com.br LTDA. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<script src="js/comum.js" charset="UTF-8"></script>
+<script src="js/perguntas.js" charset="UTF-8"></script>
+<script src="js/ranking.js" charset="UTF-8"></script>
+<script src="js/roleta.js" charset="UTF-8"></script>
+<script src="js/compartilhar.js" charset="UTF-8"></script>
+<script src="js/resgate.js" charset="UTF-8"></script>
+<script src="js/quiz.js" charset="UTF-8"></script>
+</body>
+</html>

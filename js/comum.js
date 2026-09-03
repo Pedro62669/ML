@@ -5,9 +5,9 @@ const PROMOCAO = {
   fim: new Date('2026-09-15T23:59:59'),
   chaveRodadas: 'quizPremiado.rodadas',
   chaveParticipante: 'quizPremiado.participante',
-  chaveSaldo: 'quizPremiado.saldo',
+  chaveGiros: 'quizPremiado.giros',
   chavePremios: 'quizPremiado.premios',
-  chaveCompartilhamentos: 'quizPremiado.compartilhamentos'
+  chaveCanais: 'quizPremiado.canais'
 };
 
 /* -------------------------- Armazenamento local -------------------------- */
@@ -50,7 +50,7 @@ function salvarParticipante(participante) {
   }
 }
 
-/* Saldo e prêmios são guardados POR E-MAIL: quem troca o e-mail começa do
+/* Giros e prêmios são guardados POR E-MAIL: quem troca o e-mail começa do
    zero, sem herdar os giros nem os prêmios de quem jogou antes no mesmo
    navegador. Os dois ficam em um mapa { e-mail: valor }. */
 
@@ -77,17 +77,17 @@ function salvarMapa(chave, mapa) {
   }
 }
 
-/* Saldo de pontos: é o que paga os giros da roleta. */
+/* Giros disponíveis: um por acerto no quiz, mais um por rede compartilhada. */
 
-function lerSaldo() {
-  const valor = parseInt(lerMapa(PROMOCAO.chaveSaldo)[emailAtivo()], 10);
+function lerGiros() {
+  const valor = parseInt(lerMapa(PROMOCAO.chaveGiros)[emailAtivo()], 10);
   return Number.isFinite(valor) && valor > 0 ? valor : 0;
 }
 
-function salvarSaldo(saldo) {
-  const mapa = lerMapa(PROMOCAO.chaveSaldo);
-  mapa[emailAtivo()] = Math.max(saldo, 0);
-  salvarMapa(PROMOCAO.chaveSaldo, mapa);
+function salvarGiros(giros) {
+  const mapa = lerMapa(PROMOCAO.chaveGiros);
+  mapa[emailAtivo()] = Math.max(giros, 0);
+  salvarMapa(PROMOCAO.chaveGiros, mapa);
 }
 
 /* Prêmios já sorteados na roleta. */
@@ -117,31 +117,33 @@ function atualizarPremio(id, dados) {
   salvarMapa(PROMOCAO.chavePremios, mapa);
 }
 
-/* Compartilhamentos feitos por este e-mail (cada um vale um giro). */
+/* Redes já usadas por este e-mail: cada uma vale um giro, uma vez só. */
 
-function lerCompartilhamentos() {
-  const valor = parseInt(lerMapa(PROMOCAO.chaveCompartilhamentos)[emailAtivo()], 10);
-  return Number.isFinite(valor) && valor > 0 ? valor : 0;
+function lerCanaisUsados() {
+  const lista = lerMapa(PROMOCAO.chaveCanais)[emailAtivo()];
+  return Array.isArray(lista) ? lista : [];
 }
 
-function contarCompartilhamento() {
-  const mapa = lerMapa(PROMOCAO.chaveCompartilhamentos);
-  mapa[emailAtivo()] = lerCompartilhamentos() + 1;
-  salvarMapa(PROMOCAO.chaveCompartilhamentos, mapa);
+function canalJaUsado(id) {
+  return lerCanaisUsados().indexOf(id) !== -1;
 }
 
-/* Antes disso, saldo e prêmios eram um valor solto, sem dono. Se ainda estiver
-   no formato antigo, passa tudo para o e-mail que está salvo no navegador. */
+function marcarCanalUsado(id) {
+  if (canalJaUsado(id)) return false;
+
+  const mapa = lerMapa(PROMOCAO.chaveCanais);
+  mapa[emailAtivo()] = lerCanaisUsados().concat(id);
+  salvarMapa(PROMOCAO.chaveCanais, mapa);
+  return true;
+}
+
+/* Antes disso, os prêmios eram uma lista solta, sem dono. Se ainda estiver no
+   formato antigo, passa tudo para o e-mail que está salvo no navegador. */
 function migrarParaMapaPorEmail() {
   const email = emailAtivo();
   if (!email) return;
 
   try {
-    const saldo = localStorage.getItem(PROMOCAO.chaveSaldo);
-    if (saldo !== null && /^\d+$/.test(saldo.trim())) {
-      salvarMapa(PROMOCAO.chaveSaldo, { [email]: parseInt(saldo, 10) });
-    }
-
     const premios = JSON.parse(localStorage.getItem(PROMOCAO.chavePremios) || 'null');
     if (Array.isArray(premios)) {
       salvarMapa(PROMOCAO.chavePremios, { [email]: premios });

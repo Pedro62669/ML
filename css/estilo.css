@@ -39,6 +39,10 @@ body {
 }
 
 img { max-width: 100%; display: block; }
+
+/* O display do navegador para [hidden] perde para qualquer classe que defina
+   display (como .botao), então some com o elemento de uma vez. */
+[hidden] { display: none !important; }
 a { color: var(--azul); text-decoration: none; }
 a:hover { color: var(--azul-hover); }
 button { font-family: inherit; }
@@ -48,11 +52,6 @@ button { font-family: inherit; }
   max-width: var(--container);
   margin: 0 auto;
   padding: 0 16px;
-}
-
-.visualmente-oculto {
-  position: absolute; width: 1px; height: 1px;
-  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
 }
 
 /* ============================ TOPO ====================================== */
@@ -257,7 +256,6 @@ button { font-family: inherit; }
 .faq__pergunta::after { content: "+"; font-size: 20px; font-weight: 400; color: var(--azul); }
 .faq__pergunta[aria-expanded="true"]::after { content: "\2013"; }
 .faq__resposta { padding: 0 28px 18px; color: var(--texto-medio); margin: 0; max-width: 80ch; }
-.faq__resposta[hidden] { display: none; }
 
 /* ============================ QUIZ ====================================== */
 
@@ -336,11 +334,11 @@ button { font-family: inherit; }
 .feedback--certo { background: rgba(0, 166, 80, .08); border-color: var(--verde); }
 .feedback--errado { background: rgba(242, 61, 79, .07); border-color: var(--vermelho); }
 .feedback strong { display: block; margin-bottom: 2px; }
-.feedback[hidden] { display: none; }
+.feedback .botao { margin-top: 12px; }
 
 .quiz__rodape { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-.quiz__pontos { font-size: 14px; color: var(--texto-medio); }
-.quiz__pontos strong { color: var(--verde); font-size: 18px; }
+.quiz__giros { font-size: 14px; color: var(--texto-medio); }
+.quiz__giros strong { color: var(--verde); font-size: 18px; }
 
 /* Cadastro e resultado --------------------------------------------------- */
 .painel { padding: 32px; text-align: center; }
@@ -397,6 +395,8 @@ button { font-family: inherit; }
 .cupom p { margin: 0; color: var(--texto-medio); font-size: 13px; }
 
 .acoes-centro { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+/* No resultado o botão vem logo depois do convite para compartilhar. */
+#tela-resultado .acoes-centro { margin-top: 22px; }
 
 .resumo { text-align: left; margin-top: 28px; }
 .resumo h3 { font-size: 16px; margin: 0 0 12px; }
@@ -495,7 +495,6 @@ button { font-family: inherit; }
   border: 1px solid var(--linha);
   background: var(--cinza-bg);
 }
-.roleta__resultado[hidden] { display: none; }
 .roleta__resultado strong { display: block; font-size: 18px; margin-bottom: 4px; }
 .roleta__resultado p { margin: 0; color: var(--texto-medio); font-size: 14px; }
 .roleta__resultado--produto { background: rgba(41, 104, 200, .08); border-color: var(--azul); }
@@ -542,48 +541,88 @@ button { font-family: inherit; }
   max-width: 380px;
 }
 .resgate__produto img { width: 56px; height: 56px; object-fit: contain; flex: 0 0 auto; }
-.resgate__produto img[hidden] { display: none; }
 .resgate__produto small { display: block; color: var(--texto-medio); font-size: 12px; }
 .resgate__produto strong { font-size: 14px; line-height: 1.3; }
 
-.seguro__detalhes { margin: -14px 0 20px !important; font-size: 14px; }
+/* A oferta de seguro segue a tela de garantia estendida da loja: página
+   branca, sem cartão, tudo alinhado à esquerda, uma opção por linha e o
+   preço na ponta direita. */
 
-.seguro__alvo {
-  text-align: left; max-width: 520px; margin: 0 auto 14px;
+body.pagina-loja { background: var(--branco); }
+body.pagina-loja .secao { padding: 32px 0 60px; }
+body.pagina-loja .quiz { max-width: none; }
+body.pagina-loja #resgate-checkout { text-align: left; }
+body.pagina-loja #resgate-checkout > h2 { font-size: 26px; margin-bottom: 20px; }
+body.pagina-loja #tela-resgate {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
 }
-.seguro__alvo small { display: block; color: var(--texto-medio); font-size: 13px; }
-.seguro__alvo strong { font-size: 15px; }
 
-.seguro__opcoes { display: grid; gap: 10px; max-width: 520px; margin: 0 auto 16px; }
+.seguro { text-align: left; }
+.seguro h2 { font-size: 26px; margin-bottom: 14px; }
+.seguro > p { color: var(--texto-medio); margin: 0 0 6px; max-width: none; font-size: 14px; }
+.seguro__detalhes { margin: 0 0 26px !important; font-size: 14px; }
+
+.seguro__alvo { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.seguro__miniatura { position: relative; flex: 0 0 auto; width: 40px; height: 40px; }
+.seguro__miniatura img {
+  width: 40px; height: 40px;
+  border-radius: 50%; object-fit: contain; padding: 4px;
+  background: var(--branco); border: 1px solid var(--linha);
+}
+.seguro__conferido {
+  position: absolute; right: -2px; bottom: -2px;
+  width: 16px; height: 16px;
+  fill: var(--verde);
+  stroke: var(--branco); stroke-width: 1.5;
+}
+.seguro__alvo-texto small { display: block; color: var(--texto-medio); font-size: 14px; }
+.seguro__alvo-texto strong { font-size: 15px; font-weight: 600; }
+
+.seguro__opcoes { display: grid; gap: 12px; margin-bottom: 18px; }
 
 .seguro__opcao {
   position: relative;
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; gap: 14px;
   border: 1px solid rgba(0, 0, 0, .2);
   border-radius: var(--raio);
-  padding: 18px 20px;
+  padding: 16px 24px;
   cursor: pointer;
   transition: border-color .15s ease, box-shadow .15s ease;
 }
+.seguro__opcao--recomendada { padding-top: 26px; }
 .seguro__opcao:hover { border-color: var(--azul); }
 .seguro__opcao--ativa { border-color: var(--azul); box-shadow: 0 0 0 1px var(--azul); }
 .seguro__opcao input { width: 18px; height: 18px; accent-color: var(--azul); flex: 0 0 auto; }
 .seguro__periodo { font-size: 16px; font-weight: 600; }
-.seguro__preco { margin-left: auto; font-size: 15px; color: var(--texto-medio); }
+
+/* Coluna de preços, encostada na direita como na loja. */
+.seguro__valores { margin-left: auto; display: grid; gap: 2px; justify-items: end; text-align: right; }
+.seguro__total { font-size: 16px; }
+.seguro__total s { margin-right: 8px; font-size: 14px; color: var(--texto-fraco); }
+.seguro__economia { font-size: 13px; color: var(--verde); }
 
 .seguro__selo {
   position: absolute; top: -1px; right: -1px;
   background: #000; color: var(--branco);
   font-size: 10px; font-weight: 700;
   text-transform: uppercase; letter-spacing: .5px;
-  padding: 3px 10px;
+  padding: 4px 10px;
   border-radius: 0 var(--raio) 0 var(--raio);
 }
 
+.seguro__rodape {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+}
 .seguro__termos {
   font-size: 13px; color: var(--texto-medio);
-  max-width: 520px; margin: 0 auto 20px !important;
+  margin: 0 !important;
 }
+.seguro__acoes { display: flex; gap: 12px; margin-left: auto; }
+.seguro__acoes .botao { padding: 11px 24px; font-size: 15px; }
 
 /* Checkout ---------------------------------------------------------------- */
 
@@ -596,45 +635,75 @@ button { font-family: inherit; }
 }
 .checkout__coluna { display: grid; gap: 16px; align-content: start; }
 
+/* Linha do produto, solta acima dos blocos, como no checkout da loja. */
 .checkout__produto {
   display: flex; align-items: center; gap: 14px;
   font-size: 14px;
 }
-.checkout__produto img { width: 56px; height: 56px; object-fit: contain; flex: 0 0 auto; }
-.checkout__produto img[hidden] { display: none; }
+.checkout__produto img {
+  width: 56px; height: 56px; object-fit: contain; flex: 0 0 auto;
+  border: 1px solid var(--linha); border-radius: 6px; padding: 4px;
+}
+.checkout__produto-texto strong { display: block; font-weight: 400; }
+.checkout__produto-texto small { color: var(--texto-medio); font-size: 13px; }
 
 .checkout__bloco {
   border: 1px solid var(--linha);
   border-radius: var(--raio);
-  padding: 18px;
+  padding: 20px;
 }
-.checkout__bloco h3 { font-size: 16px; margin: 0 0 14px; }
+.checkout__bloco h3 { font-size: 17px; margin: 0 0 16px; }
 
-.checkout__abas { display: flex; gap: 10px; margin-bottom: 14px; }
+.checkout__abas { display: flex; gap: 12px; margin-bottom: 16px; }
 .checkout__aba {
-  flex: 1;
-  background: var(--cinza-bg);
-  border: 1px solid transparent;
+  flex: 0 0 240px;
+  background: var(--branco);
+  border: 1px solid rgba(0, 0, 0, .2);
   border-radius: var(--raio);
-  padding: 10px 14px;
-  font-size: 14px; font-weight: 600; color: var(--texto);
-  cursor: pointer;
-  display: grid; gap: 2px;
+  padding: 8px 14px;
+  text-align: center;
+  display: grid; gap: 1px;
 }
-.checkout__aba small { font-size: 12px; font-weight: 400; color: var(--texto-medio); }
-.checkout__aba--ativa { background: var(--branco); border-color: var(--azul); }
+.checkout__aba b { font-size: 14px; font-weight: 600; }
+.checkout__aba small { font-size: 13px; font-weight: 400; color: var(--texto-medio); }
+.checkout__aba--ativa { border-color: var(--azul); box-shadow: 0 0 0 1px var(--azul); }
 .checkout__gratis { color: var(--verde) !important; font-weight: 600; }
 
+/* Endereço com o pino à esquerda e o atalho para trocar logo abaixo. */
 .checkout__endereco {
+  display: flex; align-items: flex-start; gap: 10px;
   border: 1px solid var(--azul);
   border-radius: var(--raio);
-  padding: 12px 14px;
+  padding: 14px 16px;
   font-size: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
 }
+.checkout__pino { width: 18px; height: 18px; flex: 0 0 auto; fill: var(--azul); margin-top: 1px; }
+.checkout__endereco-texto { display: grid; gap: 4px; }
+
+.checkout__link {
+  justify-self: start;
+  background: none; border: 0; padding: 0;
+  color: var(--azul); font-size: 13px; font-weight: 600;
+  cursor: pointer;
+}
+.checkout__link:hover { text-decoration: underline; }
+
 .checkout__envio { font-size: 14px; }
-.checkout__envio strong { display: block; }
-.checkout__envio small { color: var(--texto-medio); }
+.checkout__envio-titulo { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.checkout__envio-titulo strong { font-size: 15px; }
+.checkout__selo-full {
+  background: var(--verde); color: var(--branco);
+  font-size: 11px; font-weight: 700; font-style: italic;
+  padding: 1px 7px; border-radius: 3px;
+}
+.checkout__opcao-envio {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0;
+}
+.checkout__opcao-envio input { width: 17px; height: 17px; accent-color: var(--azul); flex: 0 0 auto; }
+.checkout__envio-preco { margin-left: auto; font-weight: 600; }
+.checkout__envio-nota { display: block; color: var(--texto-medio); font-size: 13px; }
 
 .checkout__pagamentos { display: grid; gap: 10px; }
 .pagamento {
@@ -648,6 +717,13 @@ button { font-family: inherit; }
 .pagamento:hover { border-color: var(--azul); }
 .pagamento--ativo { border-color: var(--azul); box-shadow: 0 0 0 1px var(--azul); }
 .pagamento input { width: 18px; height: 18px; accent-color: var(--azul); flex: 0 0 auto; }
+.pagamento__icone {
+  flex: 0 0 auto;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--linha); border-radius: 6px;
+}
+.pagamento__icone svg { width: 20px; height: 20px; }
 .pagamento strong { display: block; font-size: 15px; }
 .pagamento small { color: var(--texto-medio); font-size: 13px; }
 .pagamento__selo {
@@ -665,7 +741,7 @@ button { font-family: inherit; }
   position: sticky;
   top: 16px;
 }
-.checkout__resumo h3 { font-size: 17px; margin: 0 0 14px; }
+.checkout__resumo h3 { font-size: 19px; margin: 0 0 16px; }
 .checkout__resumo dl {
   display: grid; grid-template-columns: 1fr auto;
   gap: 8px 12px; margin: 0 0 14px;
@@ -673,6 +749,7 @@ button { font-family: inherit; }
 }
 .checkout__resumo dt { color: var(--texto); }
 .checkout__resumo dd { margin: 0; text-align: right; color: var(--texto); }
+.checkout__resumo dd s { margin-right: 6px; color: var(--texto-fraco); }
 
 .checkout__total {
   display: flex; justify-content: space-between; align-items: baseline;
@@ -680,8 +757,8 @@ button { font-family: inherit; }
   padding-top: 14px;
   font-size: 17px;
 }
-.checkout__total strong { font-size: 22px; }
-.checkout__economia { color: var(--verde); font-size: 13px; margin: 6px 0 16px; }
+.checkout__total strong { font-size: 24px; }
+.checkout__economia { color: var(--verde); font-size: 13px; margin: 6px 0 18px; text-align: right; }
 
 .checkout__voltar {
   width: 100%; margin-top: 10px;
@@ -720,6 +797,12 @@ button { font-family: inherit; }
   cursor: pointer;
   transition: border-color .15s ease, background-color .15s ease, color .15s ease;
 }
+.compartilhar__botao--usado {
+  opacity: .55;
+  border-style: dashed;
+}
+.compartilhar__botao--usado::after { content: " ✓"; }
+
 .compartilhar__botao:hover {
   border-color: var(--azul); background: var(--azul-claro); color: var(--azul);
 }
@@ -728,7 +811,6 @@ button { font-family: inherit; }
   margin: 14px 0 0 !important;
   color: var(--verde); font-weight: 600; font-size: 14px;
 }
-.compartilhar__aviso[hidden] { display: none; }
 .compartilhar__contador { margin: 8px 0 0 !important; font-size: 13px; }
 
 /* Ranking ---------------------------------------------------------------- */
@@ -785,6 +867,10 @@ button { font-family: inherit; }
   .chamada__texto h1 { font-size: 21px; }
   .quiz__pergunta { font-size: 19px; }
   .quiz__cartao, .painel { padding: 20px; }
+  .seguro__opcao { flex-wrap: wrap; padding: 18px; }
+  .seguro__valores { margin-left: 32px; justify-items: start; text-align: left; }
+  .seguro__acoes { width: 100%; margin-left: 0; }
+  .seguro__acoes .botao { flex: 1; }
   .quiz__rodape { flex-direction: column-reverse; align-items: stretch; }
   .premio__figura { height: 150px; }
   .secao { padding: 28px 0; }
@@ -794,7 +880,48 @@ button { font-family: inherit; }
   .roleta__centro { width: 76px; height: 76px; font-size: 13px; }
 }
 
+/* ========================= TELA DE CARREGAMENTO ========================== */
+/* Fica sobre a página inteira enquanto o checkout é preparado. */
+
+.carregando {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 24px;
+}
+
+body.sem-rolagem { overflow: hidden; }
+
+.carregando__texto {
+  margin: 0;
+  max-width: 260px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.carregando__circulo {
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--azul-claro);
+  border-top-color: var(--azul);
+  border-radius: 50%;
+  animation: girar-carregando .8s linear infinite;
+}
+
+@keyframes girar-carregando {
+  to { transform: rotate(360deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .roleta__disco { transition-duration: .6s; }
+  .carregando__circulo { animation-duration: 2s; }
 }

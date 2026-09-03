@@ -1,21 +1,21 @@
 /* Resgate do prêmio físico, feito no próprio site: endereço de entrega,
    oferta de seguro (que dá para pular) e confirmação. */
 
-/* Preço do seguro sai do valor do produto: 12% ao ano, na mesma proporção
-   das três opções. */
+/* Preço do seguro sai do valor do produto: 12% ao ano. O plano de 2 anos é o
+   recomendado e sai com desconto, como na garantia estendida da loja. */
 const PLANOS_DE_SEGURO = [
-  { id: '1 ano', rotulo: '1 ano', fator: 0.12, recomendado: true },
-  { id: '1 ano e meio', rotulo: '1 ano e meio', fator: 0.18, recomendado: false },
-  { id: '2 anos', rotulo: '2 anos', fator: 0.24, recomendado: false }
+  { id: '1 ano', rotulo: '1 ano', fator: 0.12, desconto: 0, recomendado: false },
+  { id: '2 anos', rotulo: '2 anos', fator: 0.24, desconto: 0.20, recomendado: true }
 ];
 
 /* Frete estimado pela região do CEP, e formas de pagamento oferecidas. */
 const FRETE_POR_REGIAO = [24.90, 24.90, 29.90, 29.90, 34.90, 34.90, 39.90, 39.90, 44.90, 44.90];
 
+/* Tempo da tela de carregamento entre o seguro e o checkout. */
+const ESPERA_DO_CHECKOUT = 1800;
+
 const FORMAS_DE_PAGAMENTO = [
-  { id: 'pix', rotulo: 'Pix', detalhe: 'Aprovação na hora', selo: 'Sem juros' },
-  { id: 'credito', rotulo: 'Cartão de crédito', detalhe: 'Parcele em até 6x', selo: '' },
-  { id: 'boleto', rotulo: 'Boleto bancário', detalhe: 'Compensa em até 2 dias úteis', selo: '' }
+  { id: 'pix', rotulo: 'Pix', detalhe: 'Aprovação na hora', selo: 'Sem juros' }
 ];
 
 const resgate = {
@@ -25,17 +25,20 @@ const resgate = {
   imagem: document.getElementById('resgate-imagem'),
   nome: document.getElementById('resgate-nome'),
   nomeSeguro: document.getElementById('seguro-produto'),
+  imagemSeguro: document.getElementById('seguro-imagem'),
   formulario: document.getElementById('formulario-entrega'),
   opcoes: document.getElementById('seguro-opcoes'),
   pular: document.getElementById('botao-pular-seguro'),
   adicionar: document.getElementById('botao-adicionar-seguro'),
+  etapaCarregando: document.getElementById('resgate-carregando'),
   etapaCheckout: document.getElementById('resgate-checkout'),
   imagemCheckout: document.getElementById('checkout-imagem'),
   nomeCheckout: document.getElementById('checkout-nome'),
-  abas: document.getElementById('checkout-abas'),
   abaFreteValor: document.getElementById('aba-frete-valor'),
   enderecoCheckout: document.getElementById('checkout-endereco'),
   prazo: document.getElementById('checkout-prazo'),
+  envioPreco: document.getElementById('checkout-envio-preco'),
+  alterarEndereco: document.getElementById('botao-alterar-endereco'),
   pagamentos: document.getElementById('checkout-pagamentos'),
   linhas: document.getElementById('checkout-linhas'),
   total: document.getElementById('checkout-total'),
@@ -53,10 +56,10 @@ const resgate = {
 };
 
 let premioEmResgate = null;
-let planoEscolhido = PLANOS_DE_SEGURO[0].id;
+let planoEscolhido = planoRecomendado().id;
 let seguroContratado = null;
-let tipoDeEntrega = 'frete';
 let pagamentoEscolhido = FORMAS_DE_PAGAMENTO[0].id;
+let esperaDoCheckout = null;
 
 /* ------------------------------ Utilitários ------------------------------ */
 
@@ -82,12 +85,12 @@ function precoDoSeguroContratado() {
 }
 
 function valorDoFrete() {
-  return tipoDeEntrega === 'retirada' ? 0 : freteDoCep(resgate.cep.value);
+  return freteDoCep(resgate.cep.value);
 }
 
 /* "Chegará entre quinta-feira e sábado", contando a partir de hoje. */
 function textoDoPrazo() {
-  const dias = tipoDeEntrega === 'retirada' ? [2, 4] : [3, 6];
+  const dias = [3, 6];
   const nomes = dias.map(soma => {
     const data = new Date();
     data.setDate(data.getDate() + soma);
@@ -95,8 +98,7 @@ function textoDoPrazo() {
     if (data.getDay() === 0) data.setDate(data.getDate() + 1);
     return data.toLocaleDateString('pt-BR', { weekday: 'long' });
   });
-  return (tipoDeEntrega === 'retirada' ? 'Disponível para retirada entre ' : 'Chegará entre ') +
-    nomes[0] + ' e ' + nomes[1];
+  return 'Chegará entre ' + nomes[0] + ' e ' + nomes[1];
 }
 
 /* Acha o produto na lista da roleta para saber imagem e valor. */
@@ -104,25 +106,46 @@ function produtoDoPremio(premio) {
   return SETORES.filter(setor => setor.nome === premio.rotulo)[0] || null;
 }
 
-function precoDoPlano(plano, produto) {
+function planoRecomendado() {
+  return PLANOS_DE_SEGURO.filter(plano => plano.recomendado)[0] || PLANOS_DE_SEGURO[0];
+}
+
+function precoCheioDoPlano(plano, produto) {
   const valor = produto && produto.valor ? produto.valor : 500;
   return Math.round(valor * plano.fator);
 }
 
+function precoDoPlano(plano, produto) {
+  return Math.round(precoCheioDoPlano(plano, produto) * (1 - plano.desconto));
+}
+
 function mostrarEtapa(nome) {
+  if (nome !== 'carregando') pararEspera();
+
   resgate.etapaEntrega.hidden = nome !== 'entrega';
   resgate.etapaSeguro.hidden = nome !== 'seguro';
+  resgate.etapaCarregando.hidden = nome !== 'carregando';
   resgate.etapaCheckout.hidden = nome !== 'checkout';
   resgate.etapaFim.hidden = nome !== 'fim';
+
+  /* A tela de carregamento cobre a página: trava a rolagem enquanto aparece. */
+  document.body.classList.toggle('sem-rolagem', nome === 'carregando');
+
+  /* Seguro e checkout saem do cartão e ocupam a página, como na loja. */
+  document.body.classList.toggle('pagina-loja', nome === 'seguro' || nome === 'checkout');
+}
+
+function pararEspera() {
+  clearTimeout(esperaDoCheckout);
+  esperaDoCheckout = null;
 }
 
 /* ------------------------------- Abertura -------------------------------- */
 
 function abrirResgate(premio) {
   premioEmResgate = premio;
-  planoEscolhido = PLANOS_DE_SEGURO[0].id;
+  planoEscolhido = planoRecomendado().id;
   seguroContratado = null;
-  tipoDeEntrega = 'frete';
   pagamentoEscolhido = FORMAS_DE_PAGAMENTO[0].id;
 
   const produto = produtoDoPremio(premio);
@@ -133,8 +156,12 @@ function abrirResgate(premio) {
     resgate.imagem.src = produto.imagem;
     resgate.imagem.alt = premio.rotulo;
     resgate.imagem.hidden = false;
+    resgate.imagemSeguro.src = produto.imagem;
+    resgate.imagemSeguro.alt = premio.rotulo;
+    resgate.imagemSeguro.hidden = false;
   } else {
     resgate.imagem.hidden = true;
+    resgate.imagemSeguro.hidden = true;
   }
 
   montarPlanos(produto);
@@ -187,18 +214,52 @@ function enviarEndereco(evento) {
 
 /* -------------------------------- Seguro --------------------------------- */
 
+/* Coluna da direita: o valor do seguro e, quando há desconto, o preço cheio
+   riscado com a economia embaixo. O seguro é pago de uma vez. */
+function valoresDoPlano(plano, produto) {
+  const caixa = document.createElement('span');
+  caixa.className = 'seguro__valores';
+
+  const cheio = precoCheioDoPlano(plano, produto);
+  const preco = precoDoPlano(plano, produto);
+
+  const total = document.createElement('span');
+  total.className = 'seguro__total';
+  if (preco < cheio) {
+    const riscado = document.createElement('s');
+    riscado.textContent = emReais(cheio);
+    total.append(riscado);
+  }
+  total.append(emReais(preco));
+
+  caixa.append(total);
+
+  if (preco < cheio) {
+    const economia = document.createElement('span');
+    economia.className = 'seguro__economia';
+    economia.textContent = 'Economize ' + emReais(cheio - preco);
+    caixa.append(economia);
+  }
+
+  return caixa;
+}
+
 function montarPlanos(produto) {
   resgate.opcoes.textContent = '';
 
   PLANOS_DE_SEGURO.forEach((plano, i) => {
+    const escolhido = plano.id === planoEscolhido;
+
     const opcao = document.createElement('label');
-    opcao.className = 'seguro__opcao' + (i === 0 ? ' seguro__opcao--ativa' : '');
+    opcao.className = 'seguro__opcao' +
+      (escolhido ? ' seguro__opcao--ativa' : '') +
+      (plano.recomendado ? ' seguro__opcao--recomendada' : '');
 
     const marcador = document.createElement('input');
     marcador.type = 'radio';
     marcador.name = 'plano-seguro';
     marcador.value = plano.id;
-    marcador.checked = i === 0;
+    marcador.checked = escolhido;
     marcador.addEventListener('change', () => {
       planoEscolhido = plano.id;
       Array.from(resgate.opcoes.children).forEach((outra, j) => {
@@ -210,11 +271,7 @@ function montarPlanos(produto) {
     rotulo.className = 'seguro__periodo';
     rotulo.textContent = plano.rotulo;
 
-    const preco = document.createElement('span');
-    preco.className = 'seguro__preco';
-    preco.textContent = emReais(precoDoPlano(plano, produto));
-
-    opcao.append(marcador, rotulo, preco);
+    opcao.append(marcador, rotulo, valoresDoPlano(plano, produto));
 
     if (plano.recomendado) {
       const selo = document.createElement('span');
@@ -252,8 +309,27 @@ function irParaCheckout(seguro) {
 
   montarPagamentos();
   atualizarCheckout();
-  mostrarEtapa('checkout');
-  rolarAteQuiz();
+
+  /* Espera curta antes de mostrar o checkout, como numa loja de verdade. */
+  mostrarEtapa('carregando');
+  esperaDoCheckout = setTimeout(() => {
+    mostrarEtapa('checkout');
+    rolarAteQuiz();
+  }, ESPERA_DO_CHECKOUT);
+}
+
+/* Losango do Pix, desenhado aqui para não depender de arquivo de imagem. */
+function desenharIconePix() {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+
+  const losango = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  losango.setAttribute('d', 'M12 3 21 12 12 21 3 12z');
+  losango.setAttribute('fill', '#32BCAD');
+
+  svg.append(losango);
+  return svg;
 }
 
 function montarPagamentos() {
@@ -275,6 +351,10 @@ function montarPagamentos() {
       });
     });
 
+    const icone = document.createElement('span');
+    icone.className = 'pagamento__icone';
+    icone.append(desenharIconePix());
+
     const texto = document.createElement('span');
     const titulo = document.createElement('strong');
     titulo.textContent = forma.rotulo;
@@ -282,7 +362,7 @@ function montarPagamentos() {
     detalhe.textContent = forma.detalhe;
     texto.append(titulo, detalhe);
 
-    opcao.append(marcador, texto);
+    opcao.append(marcador, icone, texto);
 
     if (forma.selo) {
       const selo = document.createElement('span');
@@ -296,13 +376,20 @@ function montarPagamentos() {
 }
 
 /* Uma linha do resumo: rótulo à esquerda, valor à direita. */
-function linhaDoResumo(rotulo, valor, destaque) {
+function linhaDoResumo(rotulo, valor, destaque, riscado) {
   const titulo = document.createElement('dt');
   titulo.textContent = rotulo;
 
   const dado = document.createElement('dd');
   if (destaque) dado.className = 'checkout__gratis';
-  dado.textContent = valor;
+
+  /* Valor cheio riscado antes do que a pessoa paga de fato. */
+  if (riscado) {
+    const antes = document.createElement('s');
+    antes.textContent = riscado;
+    dado.append(antes);
+  }
+  dado.append(valor);
 
   return [titulo, dado];
 }
@@ -313,35 +400,28 @@ function atualizarCheckout() {
   const frete = valorDoFrete();
   const seguro = precoDoSeguroContratado();
 
-  resgate.abaFreteValor.textContent = emReaisExato(freteDoCep(resgate.cep.value));
+  const freteTexto = frete > 0 ? emReaisExato(frete) : 'Grátis';
+
+  resgate.abaFreteValor.textContent = freteTexto;
   resgate.prazo.textContent = textoDoPrazo();
+  resgate.envioPreco.textContent = freteTexto;
 
   resgate.linhas.textContent = '';
-  resgate.linhas.append(...linhaDoResumo('Prêmio da promoção', 'Grátis', true));
+  resgate.linhas.append(...linhaDoResumo(
+    'Produto',
+    'Grátis',
+    true,
+    valorProduto > 0 ? emReais(valorProduto) : null
+  ));
   if (seguro > 0) {
     resgate.linhas.append(...linhaDoResumo('Seguro de ' + seguroContratado, emReaisExato(seguro)));
   }
-  resgate.linhas.append(...linhaDoResumo(
-    tipoDeEntrega === 'retirada' ? 'Retirada' : 'Frete',
-    frete > 0 ? emReaisExato(frete) : 'Grátis',
-    frete === 0
-  ));
+  resgate.linhas.append(...linhaDoResumo('Frete', freteTexto, frete === 0));
 
   resgate.total.textContent = emReaisExato(frete + seguro);
   resgate.economia.textContent = valorProduto > 0
-    ? 'Você economizou ' + emReais(valorProduto) + ' no valor do produto.'
+    ? 'Você economizou ' + emReais(valorProduto)
     : '';
-}
-
-function trocarEntrega(evento) {
-  const botao = evento.target.closest('[data-entrega]');
-  if (!botao) return;
-
-  tipoDeEntrega = botao.dataset.entrega;
-  Array.from(resgate.abas.children).forEach(aba => {
-    aba.classList.toggle('checkout__aba--ativa', aba === botao);
-  });
-  atualizarCheckout();
 }
 
 function concluirResgate(seguro) {
@@ -362,16 +442,15 @@ function concluirResgate(seguro) {
     resgatado: true,
     seguro: seguro,
     entrega: entrega,
-    tipoEntrega: tipoDeEntrega,
+    tipoEntrega: 'frete',
     frete: frete,
     pagamento: forma.rotulo,
     total: frete + seguroPago,
     dataResgate: new Date().toISOString()
   });
 
-  const destino = tipoDeEntrega === 'retirada'
-    ? 'Retirada no ponto mais próximo de ' + entrega.cidade + '/' + entrega.uf + '.'
-    : 'Entrega em ' + entrega.endereco + ', ' + entrega.numero + ' – ' + entrega.cidade + '/' + entrega.uf + '.';
+  const destino = 'Entrega em ' + entrega.endereco + ', ' + entrega.numero +
+    ' – ' + entrega.cidade + '/' + entrega.uf + '.';
 
   resgate.resumo.textContent = premioEmResgate.rotulo + ' está a caminho. ' + destino +
     ' ' + textoDoPrazo() + '. ' +
@@ -395,13 +474,19 @@ if (resgate.formulario) {
   resgate.pular.addEventListener('click', () => irParaCheckout(null));
   resgate.adicionar.addEventListener('click', () => irParaCheckout(planoEscolhido));
 
-  resgate.abas.addEventListener('click', trocarEntrega);
   resgate.pagar.addEventListener('click', () => concluirResgate(seguroContratado));
+  resgate.alterarEndereco.addEventListener('click', () => {
+    mostrarEtapa('entrega');
+    rolarAteQuiz();
+  });
+
   resgate.voltarSeguro.addEventListener('click', () => {
     mostrarEtapa('seguro');
     rolarAteQuiz();
   });
   resgate.voltar.addEventListener('click', () => {
+    /* Volta a etapa para o começo: também tira as marcas que o seguro deixa. */
+    mostrarEtapa('entrega');
     mostrarTela('roleta');
     rolarAteQuiz();
   });

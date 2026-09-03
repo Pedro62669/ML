@@ -1,12 +1,11 @@
-/* Motor do Quiz Premiado: cadastro, sorteio das perguntas, cronômetro,
-   pontuação e tela de resultado. */
+/* Motor do Quiz Premiado: cadastro, sorteio das perguntas, cronômetro
+   e tela de resultado. Cada resposta certa vale um giro na roleta. */
 
 const CONFIG = {
   rodadasPorEmail: 1,
   totalPerguntas: 10,
   segundosPorPergunta: 20,
-  pontosPorAcerto: 100,
-  bonusMaximo: 100
+  girosPorAcerto: 1
 };
 
 const tela = {
@@ -33,10 +32,10 @@ const el = {
   enunciado: document.getElementById('enunciado'),
   alternativas: document.getElementById('alternativas'),
   feedback: document.getElementById('feedback'),
-  pontos: document.getElementById('pontos'),
+  giros: document.getElementById('giros-da-rodada'),
   proxima: document.getElementById('botao-proxima'),
-  repetir: document.getElementById('botao-repetir'),
   irRoleta: document.getElementById('botao-ir-roleta'),
+  girosDisponiveis: document.getElementById('resultado-giros-disponiveis'),
   avisoLimite: document.getElementById('aviso-limite'),
   rodadasRestantes: document.getElementById('resultado-rodadas')
 };
@@ -46,13 +45,17 @@ const LETRAS = ['A', 'B', 'C', 'D'];
 let participante = null;
 let rodada = [];
 let indice = 0;
-let pontos = 0;
 let acertos = 0;
 let respostas = [];
 let segundosRestantes = 0;
 let temporizador = null;
 
 /* ------------------------------ Utilitários ------------------------------ */
+
+/* Giros conquistados na rodada em andamento. */
+function girosDaRodada() {
+  return acertos * CONFIG.girosPorAcerto;
+}
 
 function embaralhar(lista) {
   const copia = lista.slice();
@@ -83,6 +86,31 @@ function montarRodada() {
 
 function mostrarTela(nome) {
   Object.keys(tela).forEach(chave => { tela[chave].hidden = chave !== nome; });
+  levarCompartilhamentoPara(nome);
+}
+
+/* O convite para compartilhar é um bloco só, que segue a tela aberta: fica no
+   resultado do quiz e vai para a roleta, onde é a única forma de ganhar giro. */
+function levarCompartilhamentoPara(nome) {
+  if (nome !== 'resultado' && nome !== 'roleta') return;
+
+  const bloco = document.getElementById('bloco-compartilhar');
+  const destino = document.getElementById(
+    nome === 'resultado' ? 'compartilhar-no-resultado' : 'compartilhar-na-roleta'
+  );
+
+  if (bloco && destino && bloco.parentElement !== destino) destino.append(bloco);
+}
+
+/* Quantos giros a pessoa tem para usar agora: muda ao terminar a rodada e a
+   cada rede compartilhada. */
+function atualizarGirosDisponiveis() {
+  const giros = lerGiros();
+
+  el.girosDisponiveis.textContent = giros > 0
+    ? 'Você tem ' + (giros === 1 ? '1 giro' : giros + ' giros') + ' para usar na roleta.'
+    : 'Você ficou sem giros. Compartilhe o link da promoção para ganhar os primeiros.';
+  el.irRoleta.disabled = giros < 1;
 }
 
 function rolarAteQuiz() {
@@ -106,12 +134,23 @@ function avisarLimiteAtingido() {
   titulo.textContent = 'Você já respondeu o quiz com este e-mail.';
 
   const detalhe = document.createElement('span');
-  detalhe.textContent = lerSaldo() >= CUSTO_DO_GIRO
-    ? 'Seus pontos continuam valendo: gire a roleta ou compartilhe o link para ganhar mais giros.'
+  detalhe.textContent = lerGiros() >= 1
+    ? 'Seus giros continuam valendo: gire a roleta ou compartilhe o link para ganhar mais.'
     : 'Para ganhar mais giros, compartilhe o link da promoção na tela da roleta.';
 
+  /* Sem este atalho quem já jogou não teria como chegar aos giros e prêmios:
+     a tela de cadastro é a única que abre ao voltar ao site. */
+  const irRoleta = document.createElement('button');
+  irRoleta.type = 'button';
+  irRoleta.className = 'botao botao--principal botao--pequeno';
+  irRoleta.textContent = 'Ir para a roleta';
+  irRoleta.addEventListener('click', () => {
+    mostrarTela('roleta');
+    rolarAteQuiz();
+  });
+
   el.avisoLimite.textContent = '';
-  el.avisoLimite.append(titulo, detalhe);
+  el.avisoLimite.append(titulo, detalhe, irRoleta);
   el.avisoLimite.className = 'feedback feedback--errado';
   el.avisoLimite.hidden = false;
 
@@ -230,12 +269,11 @@ function iniciarQuiz() {
   atualizarSetores();
   rodada = montarRodada();
   indice = 0;
-  pontos = 0;
   acertos = 0;
   respostas = [];
 
   el.totalPerguntas.textContent = rodada.length;
-  el.pontos.textContent = '0';
+  el.giros.textContent = '0';
 
   mostrarTela('jogo');
   rolarAteQuiz();
@@ -284,11 +322,9 @@ function responder(escolha) {
   let ganhos = 0;
 
   if (acertou) {
-    const bonus = Math.round(CONFIG.bonusMaximo * (Math.max(segundosRestantes, 0) / CONFIG.segundosPorPergunta));
-    ganhos = CONFIG.pontosPorAcerto + bonus;
-    pontos += ganhos;
+    ganhos = CONFIG.girosPorAcerto;
     acertos++;
-    el.pontos.textContent = pontos;
+    el.giros.textContent = girosDaRodada();
   }
 
   respostas.push({
@@ -322,7 +358,9 @@ function exibirFeedback(acertou, tempoEsgotado, pergunta, ganhos) {
   const detalhe = document.createElement('span');
 
   if (acertou) {
-    titulo.textContent = 'Resposta certa! +' + ganhos + ' pontos';
+    titulo.textContent = ganhos === 1
+      ? 'Resposta certa! +1 giro'
+      : 'Resposta certa! +' + ganhos + ' giros';
   } else if (tempoEsgotado) {
     titulo.textContent = 'O tempo acabou. A resposta era: ' + pergunta.alternativas[pergunta.correta];
   } else {
@@ -353,10 +391,10 @@ function finalizar() {
 
   const percentual = acertos / rodada.length;
   const faixas = [
-    { minimo: 1, icone: '🏆', titulo: 'Nota máxima!', mensagem: 'Você gabaritou o quiz. Sua pontuação já está valendo na disputa.' },
+    { minimo: 1, icone: '🏆', titulo: 'Nota máxima!', mensagem: 'Você gabaritou o quiz e levou um giro por resposta certa.' },
     { minimo: 0.7, icone: '🎉', titulo: 'Muito bom!', mensagem: 'Você conhece bem o Brasil e já está concorrendo aos prêmios.' },
     { minimo: 0.4, icone: '👏', titulo: 'Bom resultado!', mensagem: 'Deu para ver que você manja do assunto. Amanhã dá para melhorar.' },
-    { minimo: 0, icone: '📚', titulo: 'Valeu por participar!', mensagem: 'O banco de perguntas é grande: jogue de novo e aumente sua pontuação.' }
+    { minimo: 0, icone: '📚', titulo: 'Valeu por participar!', mensagem: 'O banco de perguntas é grande: cada acerto vale um giro na roleta.' }
   ];
   const faixa = faixas.find(item => percentual >= item.minimo);
 
@@ -365,37 +403,26 @@ function finalizar() {
   document.getElementById('resultado-mensagem').textContent = faixa.mensagem;
   document.getElementById('resultado-acertos').textContent = acertos;
   document.getElementById('resultado-total').textContent = rodada.length;
-  document.getElementById('resultado-pontos').textContent = pontos;
+  /* Cada acerto vira um giro, somado aos que já estavam guardados. */
+  const ganhos = girosDaRodada();
+  salvarGiros(lerGiros() + ganhos);
 
-  /* Os pontos da rodada entram no saldo que paga os giros da roleta. */
-  const saldo = lerSaldo() + pontos;
-  salvarSaldo(saldo);
-
-  const giros = Math.floor(saldo / CUSTO_DO_GIRO);
   document.getElementById('resultado-giros').textContent =
-    giros === 1 ? '1 giro' : giros + ' giros';
-  document.getElementById('resultado-saldo').textContent = giros > 0
-    ? 'Saldo de ' + saldo.toLocaleString('pt-BR') + ' pontos. Cada giro custa ' + CUSTO_DO_GIRO + '.'
-    : 'Saldo de ' + saldo.toLocaleString('pt-BR') + ' pontos. Faltam ' + (CUSTO_DO_GIRO - saldo % CUSTO_DO_GIRO) + ' para o primeiro giro.';
-  el.irRoleta.disabled = giros < 1;
+    ganhos === 1 ? '1 giro' : ganhos + ' giros';
+  atualizarGirosDisponiveis();
 
   montarResumo();
 
   salvarRodada({
     nome: participante.exibicao,
     email: participante.email,
-    pontos: pontos,
     acertos: acertos,
     total: rodada.length,
     data: new Date().toISOString()
   });
 
-  const restantes = rodadasRestantes(participante.email);
-  el.rodadasRestantes.textContent = restantes > 0
-    ? 'Você ainda tem ' + restantes + (restantes === 1 ? ' participação' : ' participações') + ' com este e-mail.'
-    : 'O quiz é uma vez por e-mail. Para ganhar mais giros, compartilhe o link da promoção na roleta.';
-  /* Sem rodada sobrando o botão some: quem manda agora é o compartilhamento. */
-  el.repetir.hidden = restantes === 0;
+  /* A rodada é única: daqui em diante os giros extras vêm do compartilhamento. */
+  el.rodadasRestantes.textContent = 'O quiz é uma vez por e-mail.';
 
   renderizarRanking();
   atualizarRoleta();
@@ -460,22 +487,4 @@ el.irRoleta.addEventListener('click', () => {
   rolarAteQuiz();
 });
 
-/* Usada aqui e pela roleta: só volta direto ao quiz quem já se cadastrou. */
-function voltarParaOQuiz() {
-  if (participante) {
-    iniciarQuiz();
-  } else {
-    mostrarTela('cadastro');
-    rolarAteQuiz();
-  }
-}
 
-el.repetir.addEventListener('click', voltarParaOQuiz);
-
-/* Banner e botão de chamada levam direto para o formulário. */
-document.querySelectorAll('[data-ir-para-quiz]').forEach(gatilho => {
-  gatilho.addEventListener('click', () => {
-    rolarAteQuiz();
-    if (!tela.cadastro.hidden) el.nome.focus({ preventScroll: true });
-  });
-});

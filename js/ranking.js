@@ -1,17 +1,18 @@
 /* Ranking parcial mostrado na tela de resultado: junta os participantes
-   de exemplo com as rodadas jogadas neste navegador. */
+   de exemplo com as rodadas jogadas neste navegador. A disputa é por
+   acertos, que é também o número de giros conquistados. */
 
 const PARTICIPANTES_EXEMPLO = [
-  { nome: 'Camila R.', pontos: 1840, acertos: 10 },
-  { nome: 'Diego M.', pontos: 1795, acertos: 10 },
-  { nome: 'Aline S.', pontos: 1710, acertos: 10 },
-  { nome: 'Rafael T.', pontos: 1650, acertos: 9 },
-  { nome: 'Juliana P.', pontos: 1580, acertos: 9 },
-  { nome: 'Marcos V.', pontos: 1495, acertos: 9 },
-  { nome: 'Beatriz L.', pontos: 1420, acertos: 8 },
-  { nome: 'Thiago A.', pontos: 1360, acertos: 8 },
-  { nome: 'Fernanda C.', pontos: 1285, acertos: 8 },
-  { nome: 'Lucas B.', pontos: 1190, acertos: 7 }
+  { nome: 'Camila R.', acertos: 10 },
+  { nome: 'Diego M.', acertos: 10 },
+  { nome: 'Aline S.', acertos: 10 },
+  { nome: 'Rafael T.', acertos: 9 },
+  { nome: 'Juliana P.', acertos: 9 },
+  { nome: 'Marcos V.', acertos: 9 },
+  { nome: 'Beatriz L.', acertos: 8 },
+  { nome: 'Thiago A.', acertos: 8 },
+  { nome: 'Fernanda C.', acertos: 8 },
+  { nome: 'Lucas B.', acertos: 7 }
 ];
 
 const LIMITE_LINHAS = 10;
@@ -22,10 +23,9 @@ function melhoresRodadasLocais() {
 
   lerRodadas().forEach(rodada => {
     const atual = melhores.get(rodada.nome);
-    if (!atual || rodada.pontos > atual.pontos) {
+    if (!atual || rodada.acertos > atual.acertos) {
       melhores.set(rodada.nome, {
         nome: rodada.nome,
-        pontos: rodada.pontos,
         acertos: rodada.acertos,
         meu: true
       });
@@ -46,14 +46,14 @@ function celula(conteudo) {
 }
 
 /* Monta a tabela e garante que a linha de quem acabou de jogar apareça,
-   mesmo que a pontuação fique fora das primeiras posições. */
+   mesmo que o resultado fique fora das primeiras posições. */
 function renderizarRanking() {
   const corpo = document.getElementById('corpo-ranking');
   if (!corpo) return;
 
   const lista = melhoresRodadasLocais()
     .concat(PARTICIPANTES_EXEMPLO)
-    .sort((a, b) => b.pontos - a.pontos);
+    .sort((a, b) => b.acertos - a.acertos);
 
   const visiveis = lista.slice(0, LIMITE_LINHAS);
   const minhaPosicao = lista.findIndex(item => item.meu);
@@ -76,7 +76,7 @@ function renderizarRanking() {
       celula(selo),
       celula(participante.nome + (participante.meu ? ' (você)' : '')),
       celula(participante.acertos + '/10'),
-      celula(participante.pontos.toLocaleString('pt-BR'))
+      celula(participante.acertos === 1 ? '1 giro' : participante.acertos + ' giros')
     );
     corpo.append(linha);
   });
